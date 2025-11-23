@@ -345,7 +345,7 @@ export function PackageList() {
     id: item._id,
     name: item.name,
     price: `₹${item.price}`,
-    category: "N/A",
+    createdAt: item.createdAt ? new Date(item.createdAt).toLocaleDateString() : "N/A",
     city: "N/A",
     status: "Active",
     featured: false,
@@ -359,7 +359,7 @@ export function PackageList() {
     const matchesSearch =
       pkg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       pkg.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pkg.city.toLowerCase().includes(searchQuery.toLowerCase())
+      pkg.city.toLowerCase().includes(searchQuery.toLowerCase()) ;
 
     const matchesStatus = statusFilter === "all" || pkg.status.toLowerCase() === statusFilter.toLowerCase()
 
@@ -602,10 +602,10 @@ export function PackageList() {
                   />
                 </TableHead>
                 <TableHead>Package</TableHead>
-                <TableHead>Category</TableHead>
                 <TableHead>City</TableHead>
                 <TableHead>Price</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Created</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
@@ -675,8 +675,10 @@ export function PackageList() {
                         </div>
                       </div>
                     </TableCell>
-                    <TableCell>{pkg.category}</TableCell>
-                    <TableCell>{pkg.city}</TableCell>
+
+                    <TableCell>{pkg.city !== "N/A" ? pkg.city : "All"}</TableCell>
+
+
                     <TableCell className="font-medium">{pkg.price}</TableCell>
                     <TableCell>
                       <Badge
@@ -686,6 +688,7 @@ export function PackageList() {
                         {pkg.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>{pkg.createdAt}</TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>

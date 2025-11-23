@@ -246,7 +246,7 @@ export function UserList() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user?.profile_img || "/placeholder.svg"} alt={user?.username} />
+                      <AvatarImage src={user?.profile_img || ""} alt={user?.username} />
                       <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
@@ -258,7 +258,7 @@ export function UserList() {
                 <TableCell>{user.city !== "N/A" ? user.city : "—"}</TableCell>
                 <TableCell>{new Date(user.joinedDate).toLocaleDateString()}</TableCell>
                 <TableCell>{"-"}</TableCell>
-                <TableCell>{user?.bookingCount}</TableCell>
+                <TableCell>{user?.totalBookings}</TableCell>
                 <TableCell>
                   <Badge
                     variant={user?.isLogin === "Active" ? "default" : "secondary"}
