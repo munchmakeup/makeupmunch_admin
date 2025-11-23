@@ -9,9 +9,12 @@ interface BookingDetailsPageProps {
   params: {
     id: string
   }
+  searchParams: { bookingType?: string }
 }
 
-export default function BookingDetailsPage({ params }: BookingDetailsPageProps) {
+export default function BookingDetailsPage({ params, searchParams}: BookingDetailsPageProps) {
+    const bookingType = searchParams.bookingType === "package" ? "package" : "service"; 
+
   return (
     <div className="flex-1 space-y-4 p-4 md:p-8 pt-6">
       <DashboardHeader heading="Booking Details" text="View and manage booking information">
@@ -35,7 +38,7 @@ export default function BookingDetailsPage({ params }: BookingDetailsPageProps) 
           <CardDescription>Detailed information about the booking</CardDescription>
         </CardHeader>
         <CardContent>
-          <BookingDetails id={params.id} />
+          <BookingDetails id={params.id} bookingType={bookingType} />
         </CardContent>
       </Card>
     </div>

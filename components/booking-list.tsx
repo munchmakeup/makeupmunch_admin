@@ -60,9 +60,9 @@ export function BookingList() {
 
   const router = useRouter()
 
-  const handleViewBooking = (id: string) => {
+  const handleViewBooking = (id: string, bookingType: "service" | "package") => {
     console.log("Viewing booking with ID:", id)
-    router.push(`/bookings/${id}`)
+    router.push(`/bookings/${id}?bookingType=${bookingType}`)
   }
 
   const handleEditBooking = (id: string) => {
@@ -138,7 +138,7 @@ export function BookingList() {
           <TableBody>
             {filteredBookings?.map((booking) => (
               <TableRow key={booking.id}
-                onClick={() => handleViewBooking(booking.bookingId)}
+                onClick={() => handleViewBooking(booking.bookingId, booking.bookingType)}
                 className="cursor-pointer hover:bg-muted/50 transition"
               >
 
@@ -156,7 +156,7 @@ export function BookingList() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                   <AvatarFallback>{booking?.customerName.charAt(0)?.toUpperCase()}</AvatarFallback>
+                      <AvatarFallback>{booking?.customerName.charAt(0)?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{booking?.customerName}</span>
@@ -165,7 +165,7 @@ export function BookingList() {
                   </div>
                 </TableCell>
                 <TableCell>
-                                        <span className="text-sm font-medium">{booking?.bookingType}</span>
+                  <span className="text-sm font-medium">{booking?.bookingType}</span>
 
                   {/* {booking.services?.map(service => (
                     <div key={service.serviceName}>
@@ -200,7 +200,7 @@ export function BookingList() {
                     {booking.BookingStatus}
                   </Badge>
                 </TableCell>
-                      <TableCell>
+                <TableCell>
                   <Badge
                     variant={
                       booking.PaymentStatus === "paid"

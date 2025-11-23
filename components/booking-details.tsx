@@ -10,9 +10,10 @@ import { useGetData } from "@/services/queryHooks/useGetData"
 
 interface BookingDetailsProps {
   id: string
+  bookingType: "service" | "package";
 }
 
-export function BookingDetails({ id }: BookingDetailsProps) {
+export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
   // const [booking, setBooking] = useState<any>(null)
   const [isDataLoading, setIsLoading] = useState(true)
 
@@ -20,7 +21,7 @@ export function BookingDetails({ id }: BookingDetailsProps) {
 
   const { data, isLoading, isError, error } = useGetData(
     `bookingDetail_${id}`,
-    `/admin/getBookingDetailsById/${id}`
+    `/admin/getBookingDetailsById/${id}?bookingType=${bookingType}`
   );
 
   const booking = data?.data
