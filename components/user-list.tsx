@@ -111,6 +111,10 @@ export function UserList() {
     "admin/getAllUsersForAdmin"
   );
 
+
+
+
+
   const apiusers = data?.data || [];
 
   const filteredUsers = apiusers.filter(
@@ -224,8 +228,14 @@ export function UserList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredUsers.map((user) => (
-              <TableRow key={user?._id}>
+            {filteredUsers.map((user: any) => (
+
+              <TableRow key={user?._id}
+                onClick={() => handleViewUser(user?._id)}
+                className="cursor-pointer hover:bg-muted/50 transition"
+
+
+              >
                 <TableCell>
                   <Checkbox
                     checked={selectedUsers.includes(user._id)}

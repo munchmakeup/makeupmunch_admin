@@ -6,52 +6,63 @@ import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
 import { Calendar, Clock, MapPin, Phone, Mail, User, Package, CreditCard, FileText } from "lucide-react"
+import { useGetData } from "@/services/queryHooks/useGetData"
 
 interface BookingDetailsProps {
   id: string
 }
 
 export function BookingDetails({ id }: BookingDetailsProps) {
-  const [booking, setBooking] = useState<any>(null)
-  const [isLoading, setIsLoading] = useState(true)
+  // const [booking, setBooking] = useState<any>(null)
+  const [isDataLoading, setIsLoading] = useState(true)
+
+  console.log("Fetching booking data for ID:", id);
+
+  const { data, isLoading, isError, error } = useGetData(
+    `bookingDetail_${id}`,
+    `/admin/getBookingDetailsById/${id}`
+  );
+
+  const booking = data?.data
+
 
   useEffect(() => {
     // Simulate API call to fetch booking details
-    setTimeout(() => {
-      setBooking({
-        id: "B-1001",
-        customer: {
-          name: "Sophia Anderson",
-          email: "sophia@example.com",
-          phone: "+91 9876543210",
-          avatar: "/placeholder.svg?height=64&width=64",
-        },
-        artist: {
-          name: "Priya Sharma",
-          email: "priya@example.com",
-          phone: "+91 9876543211",
-          avatar: "/placeholder.svg?height=64&width=64",
-          rating: 4.8,
-        },
-        package: {
-          name: "Bridal Makeup",
-          description: "Complete bridal makeup with hairstyling and draping",
-          duration: "4 hours",
-        },
-        date: "2023-06-23",
-        time: "10:00 AM",
-        status: "Confirmed",
-        amount: "₹12,500",
-        location: "123 Main Street, Bandra West, Mumbai, Maharashtra 400050",
-        notes: "Customer requested natural look with emphasis on eyes. Venue has good lighting.",
-        paymentStatus: "Paid",
-        paymentMethod: "UPI",
-        transactionId: "TXN123456789",
-        createdAt: "2023-06-20T14:30:00",
-        updatedAt: "2023-06-21T10:15:00",
-      })
-      setIsLoading(false)
-    }, 1000)
+    // setTimeout(() => {
+    //   setBooking({
+    //     id: "B-1001",
+    //     customer: {
+    //       name: "Sophia Anderson",
+    //       email: "sophia@example.com",
+    //       phone: "+91 9876543210",
+    //       avatar: "/placeholder.svg?height=64&width=64",
+    //     },
+    //     artist: {
+    //       name: "Priya Sharma",
+    //       email: "priya@example.com",
+    //       phone: "+91 9876543211",
+    //       avatar: "/placeholder.svg?height=64&width=64",
+    //       rating: 4.8,
+    //     },
+    //     package: {
+    //       name: "Bridal Makeup",
+    //       description: "Complete bridal makeup with hairstyling and draping",
+    //       duration: "4 hours",
+    //     },
+    //     date: "2023-06-23",
+    //     time: "10:00 AM",
+    //     status: "Confirmed",
+    //     amount: "₹12,500",
+    //     location: "123 Main Street, Bandra West, Mumbai, Maharashtra 400050",
+    //     notes: "Customer requested natural look with emphasis on eyes. Venue has good lighting.",
+    //     paymentStatus: "Paid",
+    //     paymentMethod: "UPI",
+    //     transactionId: "TXN123456789",
+    //     createdAt: "2023-06-20T14:30:00",
+    //     updatedAt: "2023-06-21T10:15:00",
+    //   })
+    //   setIsLoading(false)
+    // }, 1000)
   }, [id])
 
   if (isLoading) {
@@ -79,22 +90,22 @@ export function BookingDetails({ id }: BookingDetailsProps) {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={booking.customer.avatar || "/placeholder.svg"} alt={booking.customer.name} />
-                <AvatarFallback>{booking.customer.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={booking.user_id?.profile_img || ""} alt={booking.user_id?.username} />
+                <AvatarFallback>{booking.user_id?.username.charAt(0)}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-semibold">{booking.customer.name}</h3>
+                <h3 className="font-semibold">{booking.user_id?.username}</h3>
                 <p className="text-sm text-muted-foreground">Customer</p>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.customer.email}</span>
-              </div>
+                <span>{booking.user_id?.email}</span>
+              </div> 
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.customer.phone}</span>
+                <span>{booking.user_info?.phoneNumber}</span>
               </div>
             </div>
           </CardContent>
@@ -110,32 +121,32 @@ export function BookingDetails({ id }: BookingDetailsProps) {
           <CardContent className="space-y-4">
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
-                <AvatarImage src={booking.artist.avatar || "/placeholder.svg"} alt={booking.artist.name} />
-                <AvatarFallback>{booking.artist.name.charAt(0)}</AvatarFallback>
+                <AvatarImage src={booking.artist_id?.profile_img || "/placeholder.svg"} alt={booking.artist_id?.username} />
+                <AvatarFallback>{booking.artist_id?.username.charAt(0)}</AvatarFallback>
               </Avatar>
               <div>
-                <h3 className="font-semibold">{booking.artist.name}</h3>
+                <h3 className="font-semibold">{booking.artist_id?.businessName}</h3>
                 <p className="text-sm text-muted-foreground">Makeup Artist</p>
                 <div className="flex items-center gap-1">
-                  <span className="text-sm">⭐ {booking.artist.rating}</span>
+                  {/* <span className="text-sm">⭐ {booking.artist.rating}</span> */}
                 </div>
               </div>
             </div>
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Mail className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.artist.email}</span>
+                <span>{booking.artist_id?.email}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Phone className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.artist.phone}</span>
+                <span>{booking.artist_id?.phone}</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <Card>
+      {/* <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
@@ -145,7 +156,7 @@ export function BookingDetails({ id }: BookingDetailsProps) {
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
             <div>
-              <h4 className="font-medium mb-2">Package</h4>
+              <h4 className="font-medium mb-2">Services</h4>
               <p className="text-sm font-medium">{booking.package.name}</p>
               <p className="text-sm text-muted-foreground">{booking.package.description}</p>
               <p className="text-sm text-muted-foreground">Duration: {booking.package.duration}</p>
@@ -217,7 +228,7 @@ export function BookingDetails({ id }: BookingDetailsProps) {
             </>
           )}
         </CardContent>
-      </Card>
+      </Card> */}
 
       <Card>
         <CardHeader>
@@ -231,16 +242,16 @@ export function BookingDetails({ id }: BookingDetailsProps) {
             <div>
               <h4 className="font-medium mb-1">Payment Status</h4>
               <Badge variant="success" className="bg-green-500 hover:bg-green-600">
-                {booking.paymentStatus}
+                {booking.payment?.payment_status}
               </Badge>
             </div>
             <div>
               <h4 className="font-medium mb-1">Payment Method</h4>
-              <p className="text-sm">{booking.paymentMethod}</p>
+              <p className="text-sm">{booking.payment?.payment_method}</p>
             </div>
             <div>
-              <h4 className="font-medium mb-1">Transaction ID</h4>
-              <p className="text-sm font-mono">{booking.transactionId}</p>
+              <h4 className="font-medium mb-1">Booking ID</h4>
+              <p className="text-sm font-mono">{booking.payment?.booking_id}</p>
             </div>
           </div>
         </CardContent>

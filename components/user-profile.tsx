@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Calendar, MapPin, Phone, Mail, Star, Activity } from "lucide-react"
 import { useGetData } from "@/services/queryHooks/useGetData"
+import { useRouter } from "next/navigation"
 
 interface UserProfileProps {
   id: string
@@ -24,6 +25,12 @@ export function UserProfile({ id }: UserProfileProps) {
     `admin/getUserDetailsForAdmin/${id}`
   );
 
+
+  const router = useRouter()
+
+  const handleViewBooking = (id: string) => {
+    router.push(`/bookings/${id}`)
+  }
 
 
   const user = data?.data
@@ -215,29 +222,77 @@ export function UserProfile({ id }: UserProfileProps) {
             <TableHeader>
               <TableRow>
                 <TableHead>Booking ID</TableHead>
-                <TableHead>Artist</TableHead>
-                <TableHead>Package</TableHead>
+                <TableHead>Booking Type</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>TimeSlot</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Payment Status</TableHead>
                 <TableHead>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {user.bookings.map((booking: any) => (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-medium">{booking.id}</TableCell>
-                  <TableCell>{booking.artist}</TableCell>
-                  <TableCell>{booking.package}</TableCell>
+                <TableRow key={booking.id}
+                  onClick={() => handleViewBooking(booking._id)}
+                  className="cursor-pointer hover:bg-muted/50 transition"
+                >
+                  <TableCell className="font-medium">{booking._id}</TableCell>
+                  <TableCell>{booking.bookingtype}</TableCell>
                   <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{booking.timeSlot}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={booking.status === "Completed" ? "success" : "default"}
-                      className={booking.status === "Completed" ? "bg-green-500 hover:bg-green-600" : ""}
+                      variant={booking.status === "pending" ? "destructive" : "success"}
+                      className={booking.status === "confirmed" ? "bg-green-500 hover:bg-green-600" : ""}
                     >
                       {booking.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{booking.amount}</TableCell>
+                  <TableCell>
+
+                    <Badge
+                      variant={booking.payment_status === "pending" ? "destructive" : "success"}
+                    // className={booking.payment_status === "confirmed" ? "bg-green-500 hover:bg-green-600" : ""}
+                    >
+                      {booking.payment_status}
+                    </Badge>
+
+
+
+                  </TableCell>
+                  <TableCell>{booking.totalAmount}</TableCell>
+
+                </TableRow>
+              ))}
+
+
+              {user.packages.map((packages: any) => (
+                <TableRow key={packages.id}
+                  onClick={() => handleViewBooking(packages._id)}
+                  className="cursor-pointer hover:bg-muted/50 transition"
+                >
+                  <TableCell className="font-medium">{packages._id}</TableCell>
+                  <TableCell>{packages.bookingtype}</TableCell>
+                  <TableCell>{new Date(packages.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{packages.timeSlot}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={packages.status === "pending" ? "destructive" : "success"}
+                    >
+                      {packages.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+
+                    <Badge
+                      variant={packages.payment_status === "pending" ? "destructive" : "success"}
+                    >
+                      {packages.payment_status}
+
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{packages.totalAmount}</TableCell>
+
                 </TableRow>
               ))}
             </TableBody>

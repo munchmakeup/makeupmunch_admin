@@ -15,13 +15,15 @@ interface ArtistProfileProps {
 
 export function ArtistProfile({ id }: ArtistProfileProps) {
   const [artist, setArtist] = useState<any>(null)
-   const [isLoading, setIsLoading] = useState(true)
+  const [isDataLoading, setIsLoading] = useState(true)
+console.log("Fetching artist data for ID:", id);
 
-
-    const { data:response , isLoadings, isError, error } = useGetData(`artist_${id}`, `admin/getArtistDetailsForAdmin/${id}`)
+    const { data:response , isLoading, isError, error } = useGetData(`artist_${id}`, `admin/getArtistDetailsForAdmin/${id}`)
 
 
   const artistData = response?.data
+
+  console.log("Artist data fetched:", artistData);
 
   useEffect(() => {
 
@@ -93,7 +95,7 @@ export function ArtistProfile({ id }: ArtistProfileProps) {
     }, 1000)
   }, [id])
 
-  if (isLoadings) {
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-[400px]">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
@@ -104,13 +106,7 @@ export function ArtistProfile({ id }: ArtistProfileProps) {
   if (!artist) {
     return <div>Artist not found</div>
   }
-  if (isLoadings) {
-    return (
-      <div className="flex items-center justify-center h-[400px]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-      </div>
-    )
-  }
+ 
 
   if (isError || !artist) {
     return <div className="text-red-500">Failed to load artist data: {error?.message || "Unknown error"}</div>
@@ -123,11 +119,11 @@ export function ArtistProfile({ id }: ArtistProfileProps) {
         <Card className="md:col-span-1">
           <CardHeader className="text-center">
             <Avatar className="h-24 w-24 mx-auto mb-4">
-              <AvatarImage src={artistData.profile_img || "/placeholder.svg"} alt={artistData.username} />
-              <AvatarFallback className="text-2xl">{artistData.username.charAt(0)}</AvatarFallback>
+              <AvatarImage src={artistData?.profile_img ?? "/placeholder.svg"} alt={artistData?.username} />
+              <AvatarFallback className="text-2xl">{artistData?.username.charAt(0)}</AvatarFallback>
             </Avatar>
-            <CardTitle>{artistData.username}</CardTitle>
-            <CardDescription>{artistData.businessName}</CardDescription>
+            <CardTitle>{artistData?.username}</CardTitle>
+            <CardDescription>{artistData?.businessName}</CardDescription>
             <div className="flex items-center justify-center gap-2">
               <Badge
                 variant={artistData.Status === "approved" ? "default" : "secondary"}

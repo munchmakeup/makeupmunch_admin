@@ -26,18 +26,18 @@ export function BookingList() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedBookings, setSelectedBookings] = useState<string[]>([])
 
-  const { data , isError , isLoading , error} = useGetData("getAllUsers", "admin/getAllBookingsForAdmin")
+  const { data, isError, isLoading, error } = useGetData("getAllUsers", "admin/getAllBookingsForAdmin")
 
-const bookings = Array.isArray(data) ? data : []
+  const bookings = Array.isArray(data) ? data : []
 
-const filteredBookings = bookings.filter(
-  (booking) =>
-    (booking?.bookingId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking?.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      booking?.package?.toLowerCase?.().includes(searchQuery.toLowerCase()) || // optional
-      booking?.artistName.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (statusFilter === "all" || booking.status.toLowerCase() === statusFilter.toLowerCase())
-)
+  const filteredBookings = bookings.filter(
+    (booking) =>
+      (booking?.bookingId.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking?.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        booking?.package?.toLowerCase?.().includes(searchQuery.toLowerCase()) || // optional
+        booking?.artistName.toLowerCase().includes(searchQuery.toLowerCase())) &&
+      (statusFilter === "all" || booking.status.toLowerCase() === statusFilter.toLowerCase())
+  )
 
   const toggleSelectAll = () => {
     if (selectedBookings.length === filteredBookings?.length) {
@@ -58,18 +58,19 @@ const filteredBookings = bookings.filter(
 
 
 
- const router = useRouter()
+  const router = useRouter()
 
-const handleViewBooking = (id: string) => {
-  router.push(`/bookings/${id}`)
-}
+  const handleViewBooking = (id: string) => {
+    console.log("Viewing booking with ID:", id)
+    router.push(`/bookings/${id}`)
+  }
 
-const handleEditBooking = (id: string) => {
-  router.push(`/bookings/${id}/edit`)
-}
+  const handleEditBooking = (id: string) => {
+    router.push(`/bookings/${id}/edit`)
+  }
 
 
-console.log("datatt," , data)
+  console.log("datatt,", data)
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
@@ -135,19 +136,26 @@ console.log("datatt," , data)
           </TableHeader>
           <TableBody>
             {filteredBookings?.map((booking) => (
-              <TableRow key={booking.id}>
+              <TableRow key={booking.id}
+                onClick={() => handleViewBooking(booking.bookingId)}
+                className="cursor-pointer hover:bg-muted/50 transition"
+              >
+
+
+
+
                 <TableCell>
                   <Checkbox
-                    checked={selectedBookings.includes(booking.id)}
-                    onCheckedChange={() => toggleSelectBooking(booking.id)}
-                    aria-label={`Select ${booking.id}`}
+                    checked={selectedBookings.includes(booking.bookingId)}
+                    onCheckedChange={() => toggleSelectBooking(booking.bookingId)}
+                    aria-label={`Select ${booking.bookingId}`}
                   />
                 </TableCell>
                 <TableCell className="font-medium">{booking?.bookingId}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={booking?.customerImage || "/placeholder.svg"} alt={booking?.customerName} />
+                      <AvatarImage src={booking?.customerImage || ""} alt={booking?.customerName} />
                       <AvatarFallback>{booking?.customerName.charAt(0)}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
@@ -157,17 +165,17 @@ console.log("datatt," , data)
                   </div>
                 </TableCell>
                 <TableCell>
-  {booking.services?.map(service => (
-    <div key={service.serviceName}>
-      <div className="font-medium">{service.serviceName}</div>
-      <ul className="text-sm text-muted-foreground list-disc ml-4">
-        {service.subServices?.map((sub, index) => (
-          <li key={index}>{sub.name} x{sub.quantity}</li>
-        ))}
-      </ul>
-    </div>
-  ))}
-</TableCell>
+                  {booking.services?.map(service => (
+                    <div key={service.serviceName}>
+                      <div className="font-medium">{service.serviceName}</div>
+                      {/* <ul className="text-sm text-muted-foreground list-disc ml-4">
+                        {service.subServices?.map((sub, index) => (
+                          <li key={index}>{sub.name} x{sub.quantity}</li>
+                        ))}
+                      </ul> */}
+                    </div>
+                  ))}
+                </TableCell>
 
                 <TableCell>{booking?.artistName}</TableCell>
                 <TableCell>
@@ -179,23 +187,13 @@ console.log("datatt," , data)
                 <TableCell>
                   <Badge
                     variant={
-                      booking.status === "Confirmed"
-                        ? "default"
-                        : booking.status === "Pending"
+                      booking.status === "confirmed"
+                        ? "success"
+                        : booking.status === "pending"
                           ? "outline"
-                          : booking.status === "Completed"
-                            ? "success"
-                            : "destructive"
+                          : "destructive"
                     }
-                    className={
-                      booking?.status === "Confirmed"
-                        ? "bg-pink-500 hover:bg-pink-600"
-                        : booking.status === "Completed"
-                          ? "bg-green-500 hover:bg-green-600"
-                          : booking.status === "Pending"
-                            ? "border-yellow-500 text-yellow-500"
-                            : ""
-                    }
+
                   >
                     {booking.status}
                   </Badge>

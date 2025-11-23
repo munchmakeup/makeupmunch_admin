@@ -20,6 +20,7 @@ import { CheckCircle, Edit, Eye, MoreHorizontal, Search, Star, Trash2, XCircle }
 import { useRouter } from "next/navigation"
 import { useGetData } from "@/services/queryHooks/useGetData"
 import { ShieldCheck } from "lucide-react"
+import { Skeleton } from "@/components/ui/skeleton"
 
 
 export function ArtistList() {
@@ -68,6 +69,90 @@ export function ArtistList() {
 
   console.log("data", data);
 
+
+  // Loading state
+if (isLoading) {
+  return (
+    <div className="space-y-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <Skeleton className="h-10 w-[300px]" />
+          <Skeleton className="h-10 w-[180px]" />
+        </div>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead className="w-[40px]">
+                <Skeleton className="h-4 w-4" />
+              </TableHead>
+              <TableHead>Artist</TableHead>
+              <TableHead>Category</TableHead>
+              <TableHead>City</TableHead>
+              <TableHead>Joined</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>
+            {Array.from({ length: 5 }).map((_, index) => (
+              <TableRow key={index}>
+                <TableCell>
+                  <Skeleton className="h-4 w-4" />
+                </TableCell>
+
+                <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-10 w-10 rounded-full" />
+                    <div className="flex flex-col gap-1">
+                      <Skeleton className="h-4 w-24" />
+                      <Skeleton className="h-3 w-32" />
+                    </div>
+                  </div>
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton className="h-4 w-20" />
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton className="h-4 w-16" />
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton className="h-4 w-24" />
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton className="h-6 w-20" />
+                </TableCell>
+
+                <TableCell className="text-right">
+                  <Skeleton className="h-8 w-8 ml-auto" />
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
+  )
+}
+
+
+  // Error state
+  if (isError) {
+    return (
+      <div className="flex flex-col items-center justify-center py-12 text-center">
+        <div className="text-red-500 mb-2">Error loading packages</div>
+        <p className="text-muted-foreground mb-4">{error?.message || "Something went wrong while fetching packages"}</p>
+        <Button onClick={() => window.location.reload()}>Try Again</Button>
+      </div>
+    )
+  }
 
   return (
     <div className="space-y-4">
@@ -139,25 +224,7 @@ export function ArtistList() {
                     aria-label={`Select ${artist?.username}`}
                   />
                 </TableCell>
-                {/* <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={artist?.profile_img || "/placeholder.svg"} alt={artist?.username} />
-                      <AvatarFallback>{artist?.username.charAt(0)}</AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{artist?.username}</span>
-                        {artist.featured && (
-                          <Badge variant="outline" className="border-yellow-500 text-yellow-500">
-                            Featured
-                          </Badge>
-                        )}
-                      </div>
-                      <span className="text-xs text-muted-foreground">{artist?.email}</span>
-                    </div>
-                  </div>
-                </TableCell> */}
+
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
@@ -186,13 +253,6 @@ export function ArtistList() {
                   </div>
                 </TableCell>                <TableCell>{artist?.specialties[0]}</TableCell>
                 <TableCell>{artist?.city}</TableCell>
-                {/* <Star className="mr-1 h-4 w-4 text-yellow-500" /> */}
-                {/* <TableCell>
-                  <div className="flex items-center">
-                  
-                    <span>{artist?.joinedDate}</span>
-                  </div>
-                </TableCell> */}
 
                 <TableCell>
                   <div className="flex items-center">

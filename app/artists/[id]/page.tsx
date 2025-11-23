@@ -6,9 +6,10 @@ import { ArrowLeft, Edit } from "lucide-react"
 import Link from "next/link"
 
 interface ArtistProfilePageProps {
-  params: {
-    id: string
-  }
+  // params: {
+  //   id: string
+  // }
+    params: { id: string }
 }
 
 export default function ArtistProfilePage({ params }: ArtistProfilePageProps) {
