@@ -27,15 +27,22 @@ export function ArtistList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedArtists, setSelectedArtists] = useState<number[]>([]);
-    const [selectedServices, setSelectedServices] = useState<string[]>([])
+    const [selectedServices, setSelectedServices] = useState<string[]>([]);
+const [selectedCity, setSelectedCity] =useState([]);
 
 
   const { data, isError, isLoading, error } = useGetData("getAllUsers", "admin/getAllArtistsForAdmin");
 
   const apiArtists = Array.isArray(data?.data) ? data.data : [];
 
+console.log("apiArtists", apiArtists);
 
     const allSpecialities = Array.from(new Set((data?.data || []).flatMap((item: any) => item.specialties || [])))
+
+    const allCities = Array.from(new Set((data?.data || []).map((item: any) => item.city || [])))
+
+    console.log("allCities", allCities);
+    
 
 
  const filteredArtists = apiArtists.filter((artist) => {
@@ -53,8 +60,10 @@ export function ArtistList() {
   const matchesServices =
     selectedServices.length === 0 || // If no services selected, match all
     selectedServices.some((specialties) => artist?.specialties?.includes(specialties)); // artist.services must contain at least one selected service
-
-  return matchesSearch && matchesStatus && matchesServices;
+  const matchesCities = 
+    selectedCity.length ===0 || 
+    selectedCity.some((city)=>artist?.city.includes(city))
+  return matchesSearch && matchesStatus && matchesServices && matchesCities;
 });
 
   const toggleSelectAll = () => {
@@ -84,7 +93,6 @@ export function ArtistList() {
     router.push(`/artists/${id}/edit`)
   }
 
-  console.log("data", data);
 
 
   // Loading state
@@ -226,6 +234,36 @@ if (isLoading) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-[200px] justify-start">
+                <Filter className="mr-2 h-4 w-4" />
+                {selectedCity.length > 0
+                  ? `${selectedCity.length} City selected`
+                  : "Filter by Cities"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-64 overflow-auto w-56">
+              <DropdownMenuLabel>Select Cities</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allCities.map((city) => (
+                <DropdownMenuItem
+                  key={city}
+                  onClick={() => {
+                    if (selectedCity.includes(city)) {
+                      setSelectedCity(selectedCity.filter((c) => c !== city))
+                    } else {
+                      setSelectedCity([...selectedCity, city])
+                    }
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Checkbox className="mr-2" checked={selectedCity.includes(city)} readOnly />
+                  {city}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="flex items-center gap-2">
           {selectedArtists.length > 0 && (
@@ -298,7 +336,7 @@ if (isLoading) {
                       <span className="text-xs text-muted-foreground">{artist?.email}</span>
                     </div>
                   </div>
-                </TableCell>                <TableCell>{artist?.specialties[0]}</TableCell>
+                </TableCell>                <TableCell>{artist?.specialties?.[0]}</TableCell>
                 <TableCell>{artist?.city}</TableCell>
 
                 <TableCell>
