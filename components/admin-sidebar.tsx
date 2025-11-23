@@ -44,6 +44,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useRouter } from "next/navigation"
@@ -70,10 +71,20 @@ const handleLogout = () => {
       <Sidebar collapsible="icon">
         <SidebarHeader className="border-b">
           <div className="flex items-center gap-2 px-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-pink-600">
+            {
+              useSidebar().state =="expanded"? <div className="flex h-8 w-8 items-center justify-center rounded-full bg-pink-100 text-pink-600">
               <Gift className="h-4 w-4" />
-            </div>
-            <div className="flex-1 text-lg font-semibold">MakeupMunch</div>
+            </div> 
+            :""
+            }
+            
+            {
+              useSidebar().state ==="expanded"? 
+              <div className="flex-1 text-lg font-semibold">MakeupMunch</div>
+               :
+              ""
+            }
+            
             <SidebarTrigger />
           </div>
         </SidebarHeader>
@@ -222,7 +233,9 @@ const handleLogout = () => {
           </SidebarMenu>
         </SidebarContent>
         <SidebarFooter className="border-t p-2">
-          <div className="flex items-center justify-between">
+          <div className={`flex gap-2 ${
+      useSidebar().state === "expanded" ? "flex-row items-center" : "flex-col items-start"
+    }`}>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="flex items-center gap-2 p-2">
@@ -230,12 +243,17 @@ const handleLogout = () => {
                     <AvatarImage src="/placeholder.svg?height=32&width=32" alt="Admin" />
                     <AvatarFallback>AD</AvatarFallback>
                   </Avatar>
-                  <div className="flex flex-col items-start text-sm">
+                  {
+                    useSidebar().state=="expanded"? 
+                    <div className="flex flex-col items-start text-sm">
                     <span className="font-medium">Admin User</span>
                     <span className="text-xs text-muted-foreground">
                       {role === "super_admin" ? "Super Admin" : "Admin"}
                     </span>
                   </div>
+                  : ""
+                  }
+                  
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">
