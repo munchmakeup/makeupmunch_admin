@@ -16,9 +16,10 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Ban, Edit, Eye, MoreHorizontal, Search, Trash2, UserCheck } from "lucide-react"
+import { Ban, Edit, Eye, Filter, MoreHorizontal, Search, Trash2, UserCheck } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useGetData } from "@/services/queryHooks/useGetData"
+import { Item } from "@radix-ui/react-dropdown-menu"
 
 const users = [
   {
@@ -105,6 +106,7 @@ export function UserList() {
   const [statusFilter, setStatusFilter] = useState("all")
   const [locationFilter, setLocationFilter] = useState("all")
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
+  const [selectedCity , setSelectedCity] = useState([])
 
   const { data, isLoading, isError, error } = useGetData(
     "getAllUsers",
@@ -113,18 +115,35 @@ export function UserList() {
 
 
 
-
-
   const apiusers = data?.data || [];
 
-  const filteredUsers = apiusers.filter(
-    (user: { username: string; email: string; _id: string; status: string; location: string }) =>
-      (user?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user?._id.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (statusFilter === "all" || user.status.toLowerCase() === statusFilter.toLowerCase()) &&
-      (locationFilter === "all" || user.location.toLowerCase() === locationFilter.toLowerCase()),
+const allCities = Array.from(
+  new Set(
+    (data?.data || [])
+      .map(item => item.city?.trim())      
   )
+);
+
+  
+
+const filteredUsers = apiusers.filter((user: any) => {
+  const matchesSearch =
+    user?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    user?._id.toLowerCase().includes(searchQuery.toLowerCase());
+
+  const matchesStatus = statusFilter === "all" || user.status.toLowerCase() === statusFilter.toLowerCase();
+
+  const matchesLocation =
+    locationFilter === "all" || user.location.toLowerCase() === locationFilter.toLowerCase();
+
+  const matchesCity =
+    selectedCity.length === 0 || selectedCity.includes(user.city);
+
+  return matchesSearch && matchesStatus && matchesLocation && matchesCity;
+});
+
+
 
   const toggleSelectAll = () => {
     if (selectedUsers.length === filteredUsers.length) {
@@ -178,19 +197,38 @@ export function UserList() {
               <SelectItem value="blocked">Blocked</SelectItem>
             </SelectContent>
           </Select>
-          <Select value={locationFilter} onValueChange={setLocationFilter}>
-            <SelectTrigger className="w-full sm:w-[180px]">
-              <SelectValue placeholder="Filter by location" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Locations</SelectItem>
-              <SelectItem value="mumbai">Mumbai</SelectItem>
-              <SelectItem value="delhi">Delhi</SelectItem>
-              <SelectItem value="bangalore">Bangalore</SelectItem>
-              <SelectItem value="chennai">Chennai</SelectItem>
-              <SelectItem value="hyderabad">Hyderabad</SelectItem>
-            </SelectContent>
-          </Select>
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-[200px] justify-start">
+                <Filter className="mr-2 h-4 w-4" />
+                {selectedCity.length > 0
+                  ? `${selectedCity.length} City selected`
+                  : "Filter by Cities"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-64 overflow-auto w-56">
+              <DropdownMenuLabel>Select Cities</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allCities.map((city) => (
+                <DropdownMenuItem
+                  key={city}
+                  onClick={() => {
+                    if (selectedCity.includes(city)) {
+                      setSelectedCity(selectedCity.filter((c) => c !== city))
+                    } else {
+                      setSelectedCity([...selectedCity, city])
+                    }
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Checkbox className="mr-2" checked={selectedCity.includes(city)} readOnly />
+                  {city}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+
         </div>
         <div className="flex items-center gap-2">
           {selectedUsers.length > 0 && (
