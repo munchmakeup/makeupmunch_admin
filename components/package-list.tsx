@@ -46,9 +46,9 @@ export function PackageList() {
 
   const filteredPackages = transformedPackages.filter((pkg) => {
     const matchesSearch =
-      pkg.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pkg.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pkg.city.toLowerCase().includes(searchQuery.toLowerCase());
+      (pkg.name?.toLowerCase()||"").includes(searchQuery.toLowerCase()) ||
+      (pkg.category?.toLowerCase()|| "").includes(searchQuery.toLowerCase()) ||
+     ( pkg.city?.toLowerCase()|| "").includes(searchQuery.toLowerCase());
 
     const matchesStatus = statusFilter === "all" || pkg.status.toLowerCase() === statusFilter.toLowerCase()
 

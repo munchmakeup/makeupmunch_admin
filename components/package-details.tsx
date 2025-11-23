@@ -7,6 +7,7 @@ import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Clock, Package, MapPin, Star, Activity, CreditCard } from "lucide-react"
 import { useGetData } from "@/services/queryHooks/useGetData"
+import { useRouter } from "next/navigation"
 
 interface PackageDetailsProps {
   id: string
@@ -17,59 +18,81 @@ interface PackageDetailsProps {
 
 
 export function PackageDetails({ id }: PackageDetailsProps) {
+
   const [packageData, setPackageData] = useState<any>(null)
+
   const [isDataLoading, setIsLoading] = useState(true)
 
-  const { data, isLoading, isError, error } = useGetData(`packageDetail_${id}`, `/admin/packages/${id}`)
+    const router = useRouter()
+  
 
+
+  const { data, isLoading, isError, error } = useGetData(`packageDetail_${id}`, `/admin/packages/${id}`)
+  const packageInfo = data?.data.package || []
+  const totalBookings = data?.data.totalBookings || []
+  const totalRevenue = data?.data.totalRevenue || []
+  const bookings = data?.data.bookings || []
+
+
+    const handleViewBooking = (id: string, bookingType: "service" | "package") => {
+    console.log("Viewing booking with ID:", id)
+    router.push(`/bookings/${id}?bookingType=${bookingType}`)
+  }
+
+
+
+  
   useEffect(() => {
     // Simulate API call to fetch package details
     setTimeout(() => {
       setPackageData({
         id: "P-1001",
-        name:  data.data.name,
-        category: data.data.category || "General",
-        price: `₹${data.data.price}`,
-        duration: data.data.duration || "2 hours",
+        name: packageInfo.name,
+        category: packageInfo.category || "General",
+        price: `₹${packageInfo.price}`,
+        duration: packageInfo.duration || "2 hours",
         description:
-         data.data.description ||
+          packageInfo.description ||
           "No description available for this package.",
-       status: data.data.status || "Acwtive",
-        featured: data.data.featured ?? false,
-       inclusions: data.data.services || [],
+        status: packageInfo.status || "status not available",
+        featured: packageInfo.featured ?? false,
+        inclusions: packageInfo.services || [],
 
-        cities:  ["Lucnow", "Delhi", "Bangalore", "Chennai", "Hyderabad"],
-        totalBookings: 45,
-        totalRevenue: "₹11,25,000",
-        averageRating: 4.9,
-     createdAt: data.data.createdAt,
-        updatedAt: data.data.updatedAt,
-        recentBookings: [
-          {
-            id: "B-1001",
-            customer: "Sophia Anderson",
-            artist: "Priya Sharma",
-            date: "2023-06-23",
-            status: "Completed",
-            amount: "₹25,000",
-          },
-          {
-            id: "B-1002",
-            customer: "Emma Johnson",
-            artist: "Neha Patel",
-            date: "2023-06-20",
-            status: "Completed",
-            amount: "₹25,000",
-          },
-          {
-            id: "B-1003",
-            customer: "Olivia Williams",
-            artist: "Anjali Gupta",
-            date: "2023-06-18",
-            status: "Completed",
-            amount: "₹25,000",
-          },
-        ],
+        cities: packageInfo.cities || [],
+        totalBookings: totalBookings,
+        totalRevenue: totalRevenue,
+        averageRating: 0.0,
+        createdAt: packageInfo.createdAt,
+        updatedAt: packageInfo.updatedAt,
+        recentBookings: bookings
+
+
+        // [
+        //   {
+        //     id: "B-1001",
+        //     customer: "Sophia Anderson",
+        //     artist: "Priya Sharma",
+        //     date: "2023-06-23",
+        //     status: "Completed",
+        //     amount: "₹25,000",
+        //   },
+        //   {
+        //     id: "B-1002",
+        //     customer: "Emma Johnson",
+        //     artist: "Neha Patel",
+        //     date: "2023-06-20",
+        //     status: "Completed",
+        //     amount: "₹25,000",
+        //   },
+        //   {
+        //     id: "B-1003",
+        //     customer: "Olivia Williams",
+        //     artist: "Anjali Gupta",
+        //     date: "2023-06-18",
+        //     status: "Completed",
+        //     amount: "₹25,000",
+        //   },
+        // ],
       })
       setIsLoading(false)
     }, 1000)
@@ -100,7 +123,7 @@ export function PackageDetails({ id }: PackageDetailsProps) {
             <div className="flex items-center justify-center gap-2">
               <Badge
                 variant={packageData.status === "active" ? "success" : "destructive"}
-           >
+              >
                 {packageData.status}
               </Badge>
               {packageData.featured && <Badge className="bg-yellow-500 hover:bg-yellow-600">Featured</Badge>}
@@ -209,28 +232,37 @@ export function PackageDetails({ id }: PackageDetailsProps) {
               <TableRow>
                 <TableHead>Booking ID</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Artist</TableHead>
+
                 <TableHead>Date</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Payment Status</TableHead>
                 <TableHead>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {packageData.recentBookings.map((booking: any) => (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-medium">{booking.id}</TableCell>
-                  <TableCell>{booking.customer}</TableCell>
-                  <TableCell>{booking.artist}</TableCell>
-                  <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
+                <TableRow key={booking.id}
+                  onClick={() => handleViewBooking(booking.payment.booking_id, 'package')}
+                className="cursor-pointer hover:bg-muted/50 transition"
+                >
+                  <TableCell className="font-medium">{booking.payment.booking_id}</TableCell>
+                  <TableCell>{booking.user_info.user_Fname}</TableCell>
+                  <TableCell>{new Date(booking.booking_date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={booking.status === "Completed" ? "success" : "default"}
-                      className={booking.status === "Completed" ? "bg-green-500 hover:bg-green-600" : ""}
+                      variant={booking.status === "confirmed" ? "success" : "destructive"}
                     >
                       {booking.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{booking.amount}</TableCell>
+                  <TableCell>
+                    <Badge
+                      variant={booking.payment.payment_status === "paid" ? "success" : "destructive"}
+                    >
+                      {booking.payment.payment_status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>{booking.payment.total_amount}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

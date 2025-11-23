@@ -223,7 +223,7 @@ export function BookingList() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleViewBooking(booking.id)}>
+                      <DropdownMenuItem onClick={() => handleViewBooking(booking.id , booking.bookingType)}>
                         <Eye className="mr-2 h-4 w-4" />
                         <span>View Details</span>
                       </DropdownMenuItem>
