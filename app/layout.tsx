@@ -77,12 +77,12 @@ export default function RootLayout({
          <QueryProvider>
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           <SidebarProvider>
-            <div className="flex min-h-screen">
-              {/* <AdminSidebar />
-               */}
-                 {!shouldHideSidebar && <AdminSidebar />}
+            {/* <div className="flex min-h-screen">
+                 
               <main className="flex-1 w-full overflow-x-hidden">{children}</main>
-            </div>
+            </div> */}
+            {!shouldHideSidebar && <AdminSidebar />}
+            {children}
             <Toaster />
           </SidebarProvider>
         </ThemeProvider>

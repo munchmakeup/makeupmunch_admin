@@ -97,12 +97,12 @@ const handleLogin = async (e: React.FormEvent) => {
 
 
   return (
-    <div className="min-h-screen w-full bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4">
+    <div className="min-h-screen min-w-full bg-gradient-to-br from-pink-50 to-purple-50 flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6">
         <div className="flex flex-col items-center space-y-2 text-center">
           <div className="relative h-20 w-20 overflow-hidden rounded-full bg-white p-2 shadow-md">
             <Image
-              src="/placeholder.svg?height=80&width=80"
+              src="/logo.webp?height=80&width=80"
               width={80}
               height={80}
               alt="MakeupMunch Logo"
