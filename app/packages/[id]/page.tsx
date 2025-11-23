@@ -26,20 +26,6 @@ export default function PackageDetailsPage({ params }: PackageDetailsPageProps) 
   const { data, isLoading, isError, error } = useGetData(`packageDetail_${params.id}`, `/admin/packages/${params.id}`)
 
 
-  // send edit package screen add as a props 
-
-  //    const handleEditClick = () => {
-
-
-  //   // Pass the package data via router state
-  //   router.push(`/packages/${params.id}/edit`, {
-  //     state: {
-  //       packageData: data?.data,
-  //       fromDetails: true,
-  //     },
-  //   })
-  // }
-
 
   const handleEditClick = () => {
     // Pass package data via URL params (encoded)

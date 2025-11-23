@@ -34,7 +34,7 @@ export function PackageDetails({ id }: PackageDetailsProps) {
         description:
          data.data.description ||
           "No description available for this package.",
-       status: data.data.status || "Active",
+       status: data.data.status || "Acwtive",
         featured: data.data.featured ?? false,
        inclusions: data.data.services || [],
 
@@ -99,11 +99,8 @@ export function PackageDetails({ id }: PackageDetailsProps) {
             <CardDescription>{packageData.category}</CardDescription>
             <div className="flex items-center justify-center gap-2">
               <Badge
-                variant={packageData.status === "Active" ? "default" : "secondary"}
-                className={
-                  packageData.status === "Active" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
-                }
-              >
+                variant={packageData.status === "active" ? "success" : "destructive"}
+           >
                 {packageData.status}
               </Badge>
               {packageData.featured && <Badge className="bg-yellow-500 hover:bg-yellow-600">Featured</Badge>}
