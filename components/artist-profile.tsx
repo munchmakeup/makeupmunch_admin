@@ -112,6 +112,8 @@ console.log("Fetching artist data for ID:", id);
     return <div className="text-red-500">Failed to load artist data: {error?.message || "Unknown error"}</div>
   }
  
+  console.log("artist.specialties", artist.specialties);
+  
   
   return (
     <div className="space-y-6">
@@ -178,21 +180,21 @@ console.log("Fetching artist data for ID:", id);
               <div className="text-center p-4 border rounded-lg">
                 <div className="text-2xl font-bold text-pink-600 flex items-center justify-center gap-1">
                   <Star className="h-5 w-5" />
-                  {artist.rating}
+                  0
                 </div>
                 <div className="text-sm text-muted-foreground">Rating</div>
-                <div className="text-xs text-muted-foreground">{artist.totalReviews} reviews</div>
+                <div className="text-xs text-muted-foreground">0 reviews</div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{artist.totalBookings}</div>
+                <div className="text-2xl font-bold text-blue-600">{artistData.bookingCount}</div>
                 <div className="text-sm text-muted-foreground">Total Bookings</div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{artist.totalEarnings}</div>
+                <div className="text-2xl font-bold text-green-600">0</div>
                 <div className="text-sm text-muted-foreground">Total Earnings</div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-purple-600">{artist.basePrice}</div>
+                <div className="text-2xl font-bold text-purple-600">0</div>
                 <div className="text-sm text-muted-foreground">Base Price</div>
               </div>
             </div>
@@ -210,14 +212,39 @@ console.log("Fetching artist data for ID:", id);
       </Card>
 
       <Card>
+  <CardHeader>
+    <CardTitle>Services Offered</CardTitle>
+  </CardHeader>
+  <CardContent>
+    <div className="flex flex-col gap-3">
+      {artistData.services.map((service: any) => (
+        <div key={service._id}>
+          {/* Main service name */}
+          <span className="font-medium text-sm">{service.serviceName}</span>
+          
+          {/* Sub-services */}
+          <div className="flex flex-wrap gap-2 mt-1">
+            {service?.subServices?.map((sub: any) => (
+              <Badge key={sub._id} variant="outline" className="text-xs">
+                {sub.name} - ₹{sub.price}
+              </Badge>
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  </CardContent>
+</Card>
+
+      <Card>
         <CardHeader>
-          <CardTitle>Services Offered</CardTitle>
+          <CardTitle>Specialties</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="flex flex-wrap gap-2">
-            {artist.services.map((service: string, index: number) => (
+            {artistData.specialties?.map((speciality: string, index: number) => (
               <Badge key={index} variant="outline" className="text-sm">
-                {service}
+                {speciality}
               </Badge>
             ))}
           </div>
@@ -242,21 +269,20 @@ console.log("Fetching artist data for ID:", id);
               </TableRow>
             </TableHeader>
             <TableBody>
-              {artist.recentBookings.map((booking: any) => (
+              {artistData.bookings.map((booking: any) => (
                 <TableRow key={booking.id}>
-                  <TableCell className="font-medium">{booking.id}</TableCell>
-                  <TableCell>{booking.customer}</TableCell>
+                  <TableCell className="font-medium">{booking._id.length >10 ? `${booking._id.slice(0,10)}...` : booking._id7}</TableCell>
+                  <TableCell>{booking.userName.length > 10 ? `${booking.userName.slice(0,10)}...` : booking.userName}</TableCell>
                   <TableCell>{booking.package}</TableCell>
                   <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={booking.status === "Completed" ? "success" : "default"}
-                      className={booking.status === "Completed" ? "bg-green-500 hover:bg-green-600" : ""}
+                      variant={booking.status === "confirmed" ? "success" : "destructive"}
                     >
                       {booking.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{booking.amount}</TableCell>
+                  <TableCell>{booking.amount ? booking.amount : 0}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

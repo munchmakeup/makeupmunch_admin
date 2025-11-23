@@ -16,7 +16,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { CheckCircle, Edit, Eye, MoreHorizontal, Search, Star, Trash2, XCircle } from "lucide-react"
+import { CheckCircle, Edit, Eye, Filter, MoreHorizontal, Search, Star, Trash2, XCircle } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { useGetData } from "@/services/queryHooks/useGetData"
 import { ShieldCheck } from "lucide-react"
@@ -27,18 +27,35 @@ export function ArtistList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedArtists, setSelectedArtists] = useState<number[]>([]);
+    const [selectedServices, setSelectedServices] = useState<string[]>([])
+
 
   const { data, isError, isLoading, error } = useGetData("getAllUsers", "admin/getAllArtistsForAdmin");
 
   const apiArtists = Array.isArray(data?.data) ? data.data : [];
 
-  const filteredArtists = apiArtists.filter((artist) =>
-    (artist?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist?.specialties.join(", ").toLowerCase().includes(searchQuery.toLowerCase()) ||
-      artist?.city.toLowerCase().includes(searchQuery.toLowerCase())) &&
-    (statusFilter === "all" || artist?.Status.toLowerCase() === statusFilter.toLowerCase())
-  );
+
+    const allSpecialities = Array.from(new Set((data?.data || []).flatMap((item: any) => item.specialties || [])))
+
+
+ const filteredArtists = apiArtists.filter((artist) => {
+  // Match search query
+  const matchesSearch =
+    artist?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    artist?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    artist?.specialties.join(", ").toLowerCase().includes(searchQuery.toLowerCase()) ||
+    artist?.city.toLowerCase().includes(searchQuery.toLowerCase());
+
+  // Match status filter
+  const matchesStatus = statusFilter === "all" || artist?.Status.toLowerCase() === statusFilter.toLowerCase();
+
+  // Match selected services
+  const matchesServices =
+    selectedServices.length === 0 || // If no services selected, match all
+    selectedServices.some((specialties) => artist?.specialties?.includes(specialties)); // artist.services must contain at least one selected service
+
+  return matchesSearch && matchesStatus && matchesServices;
+});
 
   const toggleSelectAll = () => {
     if (selectedArtists.length === filteredArtists.length) {
@@ -179,6 +196,36 @@ if (isLoading) {
               <SelectItem value="rejected">Rejected</SelectItem>
             </SelectContent>
           </Select>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="w-full sm:w-[200px] justify-start">
+                <Filter className="mr-2 h-4 w-4" />
+                {selectedServices.length > 0
+                  ? `${selectedServices.length} service${selectedServices.length > 1 ? "s" : ""} selected`
+                  : "Filter by services"}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="max-h-64 overflow-auto w-56">
+              <DropdownMenuLabel>Select Services</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allSpecialities.map((specialties) => (
+                <DropdownMenuItem
+                  key={specialties}
+                  onClick={() => {
+                    if (selectedServices.includes(specialties)) {
+                      setSelectedServices(selectedServices.filter((s) => s !== specialties))
+                    } else {
+                      setSelectedServices([...selectedServices, specialties])
+                    }
+                  }}
+                  className="cursor-pointer"
+                >
+                  <Checkbox className="mr-2" checked={selectedServices.includes(specialties)} readOnly />
+                  {specialties}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
         <div className="flex items-center gap-2">
           {selectedArtists.length > 0 && (
@@ -216,7 +263,7 @@ if (isLoading) {
           </TableHeader>
           <TableBody>
             {filteredArtists.map((artist) => (
-              <TableRow key={artist?._id}>
+              <TableRow key={artist?._id} onClick={() => handleViewProfile(artist?._id)}>
                 <TableCell>
                   <Checkbox
                     checked={selectedArtists.includes(artist?._id)}
@@ -287,10 +334,6 @@ if (isLoading) {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem onClick={() => handleViewProfile(artist?._id)}>
-                        <Eye className="mr-2 h-4 w-4" />
-                        <span>View Profile</span>
-                      </DropdownMenuItem >
                       <DropdownMenuItem onClick={() => handleEditArtist(artist?._id)}>
                         <Edit className="mr-2 h-4 w-4" />
                         <span>Edit</span>
