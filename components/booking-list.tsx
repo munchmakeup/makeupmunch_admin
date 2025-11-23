@@ -126,10 +126,11 @@ export function BookingList() {
               </TableHead>
               <TableHead>Booking ID</TableHead>
               <TableHead>Customer</TableHead>
-              <TableHead>Package</TableHead>
-              <TableHead>Artist</TableHead>
+              <TableHead>Booking Type</TableHead>
+              <TableHead>City</TableHead>
               <TableHead>Date & Time</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Booking Status</TableHead>
+              <TableHead>Payment Status</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
@@ -155,8 +156,7 @@ export function BookingList() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={booking?.customerImage || ""} alt={booking?.customerName} />
-                      <AvatarFallback>{booking?.customerName.charAt(0)}</AvatarFallback>
+                   <AvatarFallback>{booking?.customerName.charAt(0)?.toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{booking?.customerName}</span>
@@ -165,19 +165,21 @@ export function BookingList() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  {booking.services?.map(service => (
+                                        <span className="text-sm font-medium">{booking?.bookingType}</span>
+
+                  {/* {booking.services?.map(service => (
                     <div key={service.serviceName}>
                       <div className="font-medium">{service.serviceName}</div>
-                      {/* <ul className="text-sm text-muted-foreground list-disc ml-4">
+                      <ul className="text-sm text-muted-foreground list-disc ml-4">
                         {service.subServices?.map((sub, index) => (
                           <li key={index}>{sub.name} x{sub.quantity}</li>
                         ))}
-                      </ul> */}
+                      </ul>
                     </div>
-                  ))}
+                  ))} */}
                 </TableCell>
 
-                <TableCell>{booking?.artistName}</TableCell>
+                <TableCell>{booking?.location}</TableCell>
                 <TableCell>
                   <div className="flex flex-col">
                     <span className="text-sm">{new Date(booking?.date).toLocaleDateString()}</span>
@@ -187,15 +189,29 @@ export function BookingList() {
                 <TableCell>
                   <Badge
                     variant={
-                      booking.status === "confirmed"
+                      booking.BookingStatus === "confirmed"
                         ? "success"
-                        : booking.status === "pending"
+                        : booking.BookingStatus === "pending"
                           ? "outline"
                           : "destructive"
                     }
 
                   >
-                    {booking.status}
+                    {booking.BookingStatus}
+                  </Badge>
+                </TableCell>
+                      <TableCell>
+                  <Badge
+                    variant={
+                      booking.PaymentStatus === "paid"
+                        ? "success"
+                        : booking.PaymentStatus === "pending"
+                          ? "outline"
+                          : "destructive"
+                    }
+
+                  >
+                    {booking.PaymentStatus}
                   </Badge>
                 </TableCell>
                 <TableCell>{booking.amount}</TableCell>

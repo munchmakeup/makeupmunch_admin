@@ -97,7 +97,7 @@ export function RecentBookings({ extended = false }: RecentBookingsProps) {
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={booking.customer.avatar || "/placeholder.svg"} alt={booking.customer.name} />
-                  <AvatarFallback>{booking.customer.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{booking.customer.name.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{booking.customer.name}</span>

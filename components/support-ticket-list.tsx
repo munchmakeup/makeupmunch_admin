@@ -259,7 +259,7 @@ export function SupportTicketList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={ticket.user.avatar || "/placeholder.svg"} alt={ticket.user.name} />
-                      <AvatarFallback>{ticket.user.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{ticket.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{ticket.user.name}</span>

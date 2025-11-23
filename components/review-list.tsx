@@ -232,7 +232,7 @@ export function ReviewList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={review.customer.avatar || "/placeholder.svg"} alt={review.customer.name} />
-                      <AvatarFallback>{review.customer.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{review.customer.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{review.customer.name}</span>

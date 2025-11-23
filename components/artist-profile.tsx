@@ -120,7 +120,7 @@ console.log("Fetching artist data for ID:", id);
           <CardHeader className="text-center">
             <Avatar className="h-24 w-24 mx-auto mb-4">
               <AvatarImage src={artistData?.profile_img ?? "/placeholder.svg"} alt={artistData?.username} />
-              <AvatarFallback className="text-2xl">{artistData?.username.charAt(0)}</AvatarFallback>
+              <AvatarFallback className="text-2xl">{artistData?.username.charAt(0).toUpperCase()}</AvatarFallback>
             </Avatar>
             <CardTitle>{artistData?.username}</CardTitle>
             <CardDescription>{artistData?.businessName}</CardDescription>

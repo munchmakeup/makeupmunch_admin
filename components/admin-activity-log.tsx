@@ -94,7 +94,7 @@ export function AdminActivityLog({ extended = false }: AdminActivityLogProps) {
               <div className="flex items-center gap-2">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={activity.admin.avatar || "/placeholder.svg"} alt={activity.admin.name} />
-                  <AvatarFallback>{activity.admin.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{activity.admin.name.charAt(0).toUpperCase()}</AvatarFallback>
                 </Avatar>
                 <div className="flex flex-col">
                   <span className="text-sm font-medium">{activity.admin.name}</span>

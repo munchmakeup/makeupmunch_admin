@@ -91,7 +91,7 @@ export function BookingDetails({ id }: BookingDetailsProps) {
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={booking.user_id?.profile_img || ""} alt={booking.user_id?.username} />
-                <AvatarFallback>{booking.user_id?.username.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{booking.user_id?.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="font-semibold">{booking.user_id?.username}</h3>
@@ -122,7 +122,7 @@ export function BookingDetails({ id }: BookingDetailsProps) {
             <div className="flex items-center gap-3">
               <Avatar className="h-12 w-12">
                 <AvatarImage src={booking.artist_id?.profile_img || "/placeholder.svg"} alt={booking.artist_id?.username} />
-                <AvatarFallback>{booking.artist_id?.username.charAt(0)}</AvatarFallback>
+                <AvatarFallback>{booking.artist_id?.username.charAt(0).toUpperCase()}</AvatarFallback>
               </Avatar>
               <div>
                 <h3 className="font-semibold">{booking.artist_id?.businessName}</h3>

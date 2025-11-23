@@ -247,7 +247,7 @@ export function UserList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user?.profile_img || "/placeholder.svg"} alt={user?.username} />
-                      <AvatarFallback>{user?.username.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{user?.username.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{user?.username}</span>

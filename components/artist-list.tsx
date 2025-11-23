@@ -228,8 +228,8 @@ if (isLoading) {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={artist?.profile_img || "/placeholder.svg"} alt={artist?.username} />
-                      <AvatarFallback>{artist?.username.charAt(0)}</AvatarFallback>
+                      <AvatarImage src={artist?.profile_img || ""} alt={artist?.username} />
+                      <AvatarFallback>{artist?.username.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <div className="flex items-center gap-2">

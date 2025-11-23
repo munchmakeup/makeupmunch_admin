@@ -148,7 +148,7 @@ export function AdminList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={admin.avatar || "/placeholder.svg"} alt={admin.name} />
-                      <AvatarFallback>{admin.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{admin.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{admin.name}</span>

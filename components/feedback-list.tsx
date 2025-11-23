@@ -225,7 +225,7 @@ export function FeedbackList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={item.user.avatar || "/placeholder.svg"} alt={item.user.name} />
-                      <AvatarFallback>{item.user.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{item.user.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{item.user.name}</span>

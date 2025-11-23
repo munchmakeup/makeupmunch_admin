@@ -208,7 +208,7 @@ export function PaymentList() {
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={payment.customer.avatar || "/placeholder.svg"} alt={payment.customer.name} />
-                      <AvatarFallback>{payment.customer.name.charAt(0)}</AvatarFallback>
+                      <AvatarFallback>{payment.customer.name.charAt(0).toUpperCase()}</AvatarFallback>
                     </Avatar>
                     <div className="flex flex-col">
                       <span className="text-sm font-medium">{payment.customer.name}</span>
