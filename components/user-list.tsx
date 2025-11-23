@@ -136,7 +136,7 @@ const filteredUsers = apiusers.filter((user: any) => {
 
   const matchesLocation =
     locationFilter === "all" || user.location.toLowerCase() === locationFilter.toLowerCase();
-
+      
   const matchesCity =
     selectedCity.length === 0 || selectedCity.includes(user.city);
 

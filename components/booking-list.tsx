@@ -142,9 +142,6 @@ export function BookingList() {
                 className="cursor-pointer hover:bg-muted/50 transition"
               >
 
-
-
-
                 <TableCell>
                   <Checkbox
                     checked={selectedBookings.includes(booking.bookingId)}
@@ -152,7 +149,7 @@ export function BookingList() {
                     aria-label={`Select ${booking.bookingId}`}
                   />
                 </TableCell>
-                <TableCell className="font-medium">{booking?.bookingId}</TableCell>
+                <TableCell className="font-medium">{booking?.bookingId.length > 10 ? `${booking?.bookingId.slice(0,10)}...` : booking?.bookingId}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Avatar className="h-8 w-8">

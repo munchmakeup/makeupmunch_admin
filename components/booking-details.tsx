@@ -24,47 +24,49 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
     `/admin/getBookingDetailsById/${id}?bookingType=${bookingType}`
   );
 
-  const booking = data?.data
+  const apiData = data?.data;
+
+  const booking = bookingType=="package" ? apiData?.packageBooking : apiData?.booking
 
 
-  useEffect(() => {
-    // Simulate API call to fetch booking details
-    // setTimeout(() => {
-    //   setBooking({
-    //     id: "B-1001",
-    //     customer: {
-    //       name: "Sophia Anderson",
-    //       email: "sophia@example.com",
-    //       phone: "+91 9876543210",
-    //       avatar: "/placeholder.svg?height=64&width=64",
-    //     },
-    //     artist: {
-    //       name: "Priya Sharma",
-    //       email: "priya@example.com",
-    //       phone: "+91 9876543211",
-    //       avatar: "/placeholder.svg?height=64&width=64",
-    //       rating: 4.8,
-    //     },
-    //     package: {
-    //       name: "Bridal Makeup",
-    //       description: "Complete bridal makeup with hairstyling and draping",
-    //       duration: "4 hours",
-    //     },
-    //     date: "2023-06-23",
-    //     time: "10:00 AM",
-    //     status: "Confirmed",
-    //     amount: "₹12,500",
-    //     location: "123 Main Street, Bandra West, Mumbai, Maharashtra 400050",
-    //     notes: "Customer requested natural look with emphasis on eyes. Venue has good lighting.",
-    //     paymentStatus: "Paid",
-    //     paymentMethod: "UPI",
-    //     transactionId: "TXN123456789",
-    //     createdAt: "2023-06-20T14:30:00",
-    //     updatedAt: "2023-06-21T10:15:00",
-    //   })
-    //   setIsLoading(false)
-    // }, 1000)
-  }, [id])
+  // useEffect(() => {
+  //   // Simulate API call to fetch booking details
+  //   setTimeout(() => {
+  //     setBooking({
+  //       id: "B-1001",
+  //       customer: {
+  //         name: "Sophia Anderson",
+  //         email: "sophia@example.com",
+  //         phone: "+91 9876543210",
+  //         avatar: "/placeholder.svg?height=64&width=64",
+  //       },
+  //       artist: {
+  //         name: "Priya Sharma",
+  //         email: "priya@example.com",
+  //         phone: "+91 9876543211",
+  //         avatar: "/placeholder.svg?height=64&width=64",
+  //         rating: 4.8,
+  //       },
+  //       package: {
+  //         name: "Bridal Makeup",
+  //         description: "Complete bridal makeup with hairstyling and draping",
+  //         duration: "4 hours",
+  //       },
+  //       date: "2023-06-23",
+  //       time: "10:00 AM",
+  //       status: "Confirmed",
+  //       amount: "₹12,500",
+  //       location: "123 Main Street, Bandra West, Mumbai, Maharashtra 400050",
+  //       notes: "Customer requested natural look with emphasis on eyes. Venue has good lighting.",
+  //       paymentStatus: "Paid",
+  //       paymentMethod: "UPI",
+  //       transactionId: "TXN123456789",
+  //       createdAt: "2023-06-20T14:30:00",
+  //       updatedAt: "2023-06-21T10:15:00",
+  //     })
+  //     setIsLoading(false)
+  //   }, 1000)
+  // }, [id])
 
   if (isLoading) {
     return (
@@ -77,6 +79,8 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
   if (!booking) {
     return <div>Booking not found</div>
   }
+
+  console.log("bookingbooking", booking)
 
   return (
     <div className="space-y-6">
@@ -146,8 +150,99 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
           </CardContent>
         </Card>
       </div>
+{bookingType === "package" && (
+  <Card className="shadow-sm border rounded-xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="text-lg font-semibold">Package Details</CardTitle>
+      <p className="text-sm text-muted-foreground">
+        Complete package booking information
+      </p>
+    </CardHeader>
 
-      {/* <Card>
+    <CardContent className="space-y-4 pt-2">
+      <div className="grid grid-cols-2 gap-3 text-sm">
+        <div>
+          <p className="text-muted-foreground">Package Name</p>
+          <p className="font-medium">{booking.package_details?.package_name}</p>
+        </div>
+
+        <div>
+          <p className="text-muted-foreground">Price</p>
+          <p className="font-medium">₹ {booking.package_details?.package_price}</p>
+        </div>
+
+        <div>
+          <p className="text-muted-foreground">Total Persons</p>
+          <p className="font-medium">
+            {booking.package_details?.total_persons}
+          </p>
+        </div>
+      </div>
+
+      <Separator />
+
+      <div className="space-y-2">
+        <p className="font-medium text-sm">Included Services</p>
+
+        {booking.package_details?.services?.map((service: any) => (
+          <div
+            key={service._id}
+            className="flex items-center gap-2 text-sm text-muted-foreground"
+          >
+            <span className="h-2 w-2 rounded-full bg-primary" />
+            {service.serviceName}
+          </div>
+        ))}
+      </div>
+    </CardContent>
+  </Card>
+)}
+
+
+
+{bookingType === "service" && (
+  <Card className="shadow-sm border rounded-xl">
+    <CardHeader className="pb-2">
+      <CardTitle className="text-lg font-semibold">Service Details</CardTitle>
+      <p className="text-sm text-muted-foreground">
+        Selected services and pricing breakdown
+      </p>
+    </CardHeader>
+
+    <CardContent className="space-y-5 pt-2">
+      {booking.service_details?.map((service: any) => (
+        <div
+          key={service._id}
+          className="rounded-lg border p-3 bg-muted/40 space-y-2"
+        >
+          <p className="font-medium text-sm">{service.serviceName}</p>
+
+          {service.selected_services?.map((ss: any) => (
+            <div
+              key={ss._id}
+              className="flex items-center justify-between text-sm text-muted-foreground"
+            >
+              <span>• {ss.subService_name}</span>
+              <span className="font-medium">₹{ss.price}</span>
+            </div>
+          ))}
+        </div>
+      ))}
+
+      <Separator />
+
+      <div className="flex items-center justify-between text-sm">
+        <p className="font-medium">Total Amount</p>
+        <p className="font-semibold text-primary">
+          ₹{booking.total_amount}
+        </p>
+      </div>
+    </CardContent>
+  </Card>
+)}
+
+
+      <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Package className="h-5 w-5" />
@@ -156,12 +251,12 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2">
-            <div>
+            {/* <div>
               <h4 className="font-medium mb-2">Services</h4>
-              <p className="text-sm font-medium">{booking.package.name}</p>
-              <p className="text-sm text-muted-foreground">{booking.package.description}</p>
-              <p className="text-sm text-muted-foreground">Duration: {booking.package.duration}</p>
-            </div>
+              <p className="text-sm font-medium">{booking?.package?.name}</p>
+              <p className="text-sm text-muted-foreground">{booking?.package?.description}</p>
+              <p className="text-sm text-muted-foreground">Duration: {booking?.package?.duration}</p>
+            </div> */}
             <div>
               <h4 className="font-medium mb-2">Status & Amount</h4>
               <div className="space-y-2">
@@ -191,6 +286,11 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
                 <p className="text-sm">
                   <span className="font-medium">Amount:</span> {booking.amount}
                 </p>
+                <div className="w-full flex justify-between">
+                  <span className="font-medium">Base Amount: {booking.payment.base_amount}</span> 
+                  <span className="font-medium">Additional Amount: {booking.payment.additional_charges}</span> 
+                  <span className="font-medium">Total Amount: {booking.payment.total_amount}</span> 
+                </div>
               </div>
             </div>
           </div>
@@ -201,11 +301,11 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-sm">
                 <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span>{new Date(booking.date).toLocaleDateString()}</span>
+                <span>{new Date(booking.booking_date).toLocaleDateString()}</span>
               </div>
               <div className="flex items-center gap-2 text-sm">
                 <Clock className="h-4 w-4 text-muted-foreground" />
-                <span>{booking.time}</span>
+                <span>{booking.booking_time}</span>
               </div>
             </div>
             <div>
@@ -229,7 +329,7 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
             </>
           )}
         </CardContent>
-      </Card> */}
+      </Card>
 
       <Card>
         <CardHeader>
@@ -242,7 +342,7 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <h4 className="font-medium mb-1">Payment Status</h4>
-              <Badge variant="success" className="bg-green-500 hover:bg-green-600">
+              <Badge variant="success" className="bg-red-500 hover:bg-red-600">
                 {booking.payment?.payment_status}
               </Badge>
             </div>
