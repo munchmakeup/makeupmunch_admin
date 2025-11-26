@@ -10,6 +10,7 @@ import {
   CreditCard,
   Gift,
   HelpCircle,
+  IndianRupee,
   LayoutDashboard,
   LogOut,
   MapPin,
@@ -141,6 +142,16 @@ const handleLogout = () => {
                 <Link href="/payments">
                   <CreditCard className="h-4 w-4" />
                   <span>Payments</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive("/artist-payments")}>
+                <Link href="/artist-payments">
+                  <IndianRupee className="h-4 w-4" />
+                  <span>Artist Payments</span>
+                  <Badge className="ml-auto">11</Badge>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
