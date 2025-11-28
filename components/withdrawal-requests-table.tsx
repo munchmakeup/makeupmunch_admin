@@ -145,7 +145,7 @@ export function WithdrawalRequestsTable() {
     }
   ]
 
-  const displayData = withdrawalRequests?.data || mockRequests
+  const displayData = withdrawalRequests?.data.requests || mockRequests
 
   const filteredRequests = displayData.filter((request: WithdrawalRequest) => {
     const matchesSearch = 

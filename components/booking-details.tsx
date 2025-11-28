@@ -264,21 +264,15 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
                   <span className="text-sm">Status:</span>
                   <Badge
                     variant={
-                      booking.status === "Confirmed"
-                        ? "default"
+                      booking.status === "confirmed"
+                        ? "success"
                         : booking.status === "Pending"
-                          ? "outline"
-                          : booking.status === "Completed"
+                          ? "destructive"
+                          : booking.status === "completed"
                             ? "success"
                             : "destructive"
                     }
-                    className={
-                      booking.status === "Confirmed"
-                        ? "bg-pink-500 hover:bg-pink-600"
-                        : booking.status === "Completed"
-                          ? "bg-green-500 hover:bg-green-600"
-                          : ""
-                    }
+                   
                   >
                     {booking.status}
                   </Badge>
@@ -342,7 +336,11 @@ export function BookingDetails({ id , bookingType }: BookingDetailsProps) {
           <div className="grid gap-4 md:grid-cols-3">
             <div>
               <h4 className="font-medium mb-1">Payment Status</h4>
-              <Badge variant="success" className="bg-red-500 hover:bg-red-600">
+              <Badge variant={
+                      booking.payment?.payment_status === "paid"
+                        ? "success"
+                            : "destructive"
+                    }>
                 {booking.payment?.payment_status}
               </Badge>
             </div>

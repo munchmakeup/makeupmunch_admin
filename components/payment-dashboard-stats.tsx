@@ -2,10 +2,10 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  TrendingUp, 
-  Users, 
-  IndianRupee, 
+import {
+  TrendingUp,
+  Users,
+  IndianRupee,
   AlertCircle,
   Clock,
   CheckCircle
@@ -13,20 +13,46 @@ import {
 import { useGetData } from "@/services/queryHooks/useGetData";
 
 export function PaymentDashboardStats() {
-  const { data: stats, isLoading } = useGetData("payment-dashboard-stats", "/admin/artist-payment/dashboard-stats")
+  const { data, isLoading } = useGetData("payment-dashboard-stats", "/admin/artist-payment/dashboard-stats")
 
-  const mockStats = {
-    totalArtists: 156,
-    totalEarnings: 2450000,
-    pendingWithdrawals: 8,
-    pendingAmount: 45000,
-    completedWithdrawals: 142,
-    completedAmount: 890000,
-    pendingVerifications: 3,
-    monthlyGrowth: 12.5
-  }
 
-  const displayStats = stats || mockStats
+
+  const apiData = data?.data || {};
+
+  const displayStats = {
+    totalArtists: apiData.totalArtists || 0,
+
+    totalAmount: apiData.monthlyPayments?.totalAmount || 0,
+
+    pendingWithdrawals:
+      apiData.withdrawalRequests?.pendingCount ||
+      apiData.pendingWithdrawals ||
+      0,
+
+    pendingAmount:
+      apiData.withdrawalRequests?.pendingAmount ||
+      apiData.pendingAmount ||
+      0,
+
+    pendingVerifications: apiData.pendingVerifications || 0,
+
+    completedWithdrawals:
+      apiData.withdrawalRequests?.completedCount ||
+      apiData.completedWithdrawals ||
+      0,
+
+    completedAmount:
+      apiData.withdrawalRequests?.completedAmount ||
+      apiData.completedAmount ||
+      0,
+
+    count:
+      apiData.monthlyPayments?.count ||
+      0,
+  };
+
+
+
 
   return (
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -38,7 +64,7 @@ export function PaymentDashboardStats() {
         <CardContent>
           <div className="text-2xl font-bold">{displayStats.totalArtists}</div>
           <p className="text-xs text-muted-foreground">
-            +{displayStats.monthlyGrowth}% from last month
+            +{displayStats.count}% from last month
           </p>
         </CardContent>
       </Card>
@@ -50,7 +76,7 @@ export function PaymentDashboardStats() {
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
-            ₹{(displayStats.totalEarnings / 100000).toFixed(1)}L
+            ₹{(displayStats.totalAmount / 100000).toFixed(1)}L
           </div>
           <p className="text-xs text-muted-foreground">
             Lifetime artist earnings
@@ -103,7 +129,7 @@ export function PaymentDashboardStats() {
               </div>
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-orange-500" />
@@ -168,4 +194,20 @@ export function PaymentDashboardStats() {
       </Card>
     </div>
   )
+}
+
+
+
+
+
+
+const mockStats = {
+  totalArtists: 156,
+  totalEarnings: 2450000,
+  pendingWithdrawals: 8,
+  pendingAmount: 45000,
+  completedWithdrawals: 142,
+  completedAmount: 890000,
+  pendingVerifications: 3,
+  monthlyGrowth: 12.5
 }

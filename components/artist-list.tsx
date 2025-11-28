@@ -27,44 +27,85 @@ export function ArtistList() {
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [selectedArtists, setSelectedArtists] = useState<number[]>([]);
-    const [selectedServices, setSelectedServices] = useState<string[]>([]);
-const [selectedCity, setSelectedCity] =useState([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
+  const [selectedCity, setSelectedCity] = useState([]);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
 
 
   const { data, isError, isLoading, error } = useGetData("getAllUsers", "admin/getAllArtistsForAdmin");
 
   const apiArtists = Array.isArray(data?.data) ? data.data : [];
 
-console.log("apiArtists", apiArtists);
+  console.log("apiArtists", apiArtists);
 
-    const allSpecialities = Array.from(new Set((data?.data || []).flatMap((item: any) => item.specialties || [])))
+  const allSpecialities = Array.from(new Set((data?.data || []).flatMap((item: any) => item.specialties || [])))
 
-    const allCities = Array.from(new Set((data?.data || []).map((item: any) => item.city || [])))
+  const allCities = Array.from(new Set((data?.data || []).map((item: any) => item.city || [])))
 
-    console.log("allCities", allCities);
-    
+  console.log("allCities", allCities);
 
 
- const filteredArtists = apiArtists.filter((artist) => {
-  // Match search query
-  const matchesSearch =
-    artist?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    artist?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    artist?.specialties.join(", ").toLowerCase().includes(searchQuery.toLowerCase()) ||
-    artist?.city.toLowerCase().includes(searchQuery.toLowerCase());
 
-  // Match status filter
-  const matchesStatus = statusFilter === "all" || artist?.Status.toLowerCase() === statusFilter.toLowerCase();
 
-  // Match selected services
-  const matchesServices =
-    selectedServices.length === 0 || // If no services selected, match all
-    selectedServices.some((specialties) => artist?.specialties?.includes(specialties)); // artist.services must contain at least one selected service
-  const matchesCities = 
-    selectedCity.length ===0 || 
-    selectedCity.some((city)=>artist?.city.includes(city))
-  return matchesSearch && matchesStatus && matchesServices && matchesCities;
-});
+  const filteredArtists = apiArtists.filter((artist) => {
+    // Match search query
+    const matchesSearch =
+      artist?.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      artist?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      artist?.specialties.join(", ").toLowerCase().includes(searchQuery.toLowerCase()) ||
+      artist?.city.toLowerCase().includes(searchQuery.toLowerCase());
+
+    // Match status filter
+    const matchesStatus = statusFilter === "all" || artist?.Status.toLowerCase() === statusFilter.toLowerCase();
+
+    // Match selected services
+    const matchesServices =
+      selectedServices.length === 0 || // If no services selected, match all
+      selectedServices.some((specialties) => artist?.specialties?.includes(specialties)); // artist.services must contain at least one selected service
+    const matchesCities =
+      selectedCity.length === 0 ||
+      selectedCity.some((city) => artist?.city.includes(city))
+
+
+
+    const matchesDate = (() => {
+      if (!startDate && !endDate) return true;
+
+      const joined = new Date(artist?.joinedDate).setHours(0, 0, 0, 0);
+      const from = startDate ? new Date(startDate).setHours(0, 0, 0, 0) : null;
+      const to = endDate ? new Date(endDate).setHours(23, 59, 59, 999) : null;
+
+      if (from && !to) {
+        return joined >= from; // from → today
+      }
+
+      if (!from && to) {
+        return joined <= to; // beginning → to
+      }
+
+      if (from && to) {
+        return joined >= from && joined <= to; // between
+      }
+
+      return true;
+    })();
+
+
+
+    return matchesSearch && matchesStatus && matchesServices && matchesCities && matchesDate;
+  });
+
+
+  const resetAllFilters = () => {
+    setSearchQuery("")
+    setStatusFilter("all")
+    setSelectedServices([])
+    setSelectedCity([])
+    setStartDate("")
+    setEndDate('')
+  }
+
 
   const toggleSelectAll = () => {
     if (selectedArtists.length === filteredArtists.length) {
@@ -96,76 +137,76 @@ console.log("apiArtists", apiArtists);
 
 
   // Loading state
-if (isLoading) {
-  return (
-    <div className="space-y-4">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
-          <Skeleton className="h-10 w-[300px]" />
-          <Skeleton className="h-10 w-[180px]" />
+  if (isLoading) {
+    return (
+      <div className="space-y-4">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <Skeleton className="h-10 w-[300px]" />
+            <Skeleton className="h-10 w-[180px]" />
+          </div>
+        </div>
+
+        <div className="rounded-md border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[40px]">
+                  <Skeleton className="h-4 w-4" />
+                </TableHead>
+                <TableHead>Artist</TableHead>
+                <TableHead>Category</TableHead>
+                <TableHead>City</TableHead>
+                <TableHead>Joined</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-4" />
+                  </TableCell>
+
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex flex-col gap-1">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-3 w-32" />
+                      </div>
+                    </div>
+                  </TableCell>
+
+                  <TableCell>
+                    <Skeleton className="h-4 w-20" />
+                  </TableCell>
+
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+
+                  <TableCell>
+                    <Skeleton className="h-6 w-20" />
+                  </TableCell>
+
+                  <TableCell className="text-right">
+                    <Skeleton className="h-8 w-8 ml-auto" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
         </div>
       </div>
-
-      <div className="rounded-md border">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[40px]">
-                <Skeleton className="h-4 w-4" />
-              </TableHead>
-              <TableHead>Artist</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>City</TableHead>
-              <TableHead>Joined</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-
-          <TableBody>
-            {Array.from({ length: 5 }).map((_, index) => (
-              <TableRow key={index}>
-                <TableCell>
-                  <Skeleton className="h-4 w-4" />
-                </TableCell>
-
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    <Skeleton className="h-10 w-10 rounded-full" />
-                    <div className="flex flex-col gap-1">
-                      <Skeleton className="h-4 w-24" />
-                      <Skeleton className="h-3 w-32" />
-                    </div>
-                  </div>
-                </TableCell>
-
-                <TableCell>
-                  <Skeleton className="h-4 w-20" />
-                </TableCell>
-
-                <TableCell>
-                  <Skeleton className="h-4 w-16" />
-                </TableCell>
-
-                <TableCell>
-                  <Skeleton className="h-4 w-24" />
-                </TableCell>
-
-                <TableCell>
-                  <Skeleton className="h-6 w-20" />
-                </TableCell>
-
-                <TableCell className="text-right">
-                  <Skeleton className="h-8 w-8 ml-auto" />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </div>
-    </div>
-  )
-}
+    )
+  }
 
 
   // Error state
@@ -234,6 +275,7 @@ if (isLoading) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" className="w-full sm:w-[200px] justify-start">
@@ -264,7 +306,34 @@ if (isLoading) {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-[150px]"
+            />
+            {/* </div> */}
+
+            <div>
+              <Input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="w-[150px]"
+              />
+            </div>
+            <div>
+              <Button onClick={resetAllFilters}>
+                Reset Filters
+              </Button>
+
+            </div>
+          </div>
+
+
         </div>
+
         <div className="flex items-center gap-2">
           {selectedArtists.length > 0 && (
             <>
@@ -279,7 +348,9 @@ if (isLoading) {
             </>
           )}
         </div>
+
       </div>
+
       <div className="rounded-md border">
         <Table>
           <TableHeader>

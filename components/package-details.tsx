@@ -23,8 +23,8 @@ export function PackageDetails({ id }: PackageDetailsProps) {
 
   const [isDataLoading, setIsLoading] = useState(true)
 
-    const router = useRouter()
-  
+  const router = useRouter()
+
 
 
   const { data, isLoading, isError, error } = useGetData(`packageDetail_${id}`, `/admin/packages/${id}`)
@@ -34,14 +34,14 @@ export function PackageDetails({ id }: PackageDetailsProps) {
   const bookings = data?.data.bookings || []
 
 
-    const handleViewBooking = (id: string, bookingType: "service" | "package") => {
+  const handleViewBooking = (id: string, bookingType: "service" | "package") => {
     console.log("Viewing booking with ID:", id)
     router.push(`/bookings/${id}?bookingType=${bookingType}`)
   }
 
 
 
-  
+
   useEffect(() => {
     // Simulate API call to fetch package details
     setTimeout(() => {
@@ -59,8 +59,8 @@ export function PackageDetails({ id }: PackageDetailsProps) {
         inclusions: packageInfo.services || [],
 
         cities: packageInfo.cities || [],
-        totalBookings: totalBookings,
-        totalRevenue: totalRevenue,
+        totalBookings: totalBookings || "no bookings",
+        totalRevenue: totalRevenue || "no revenue",
         averageRating: 0.0,
         createdAt: packageInfo.createdAt,
         updatedAt: packageInfo.updatedAt,
@@ -161,11 +161,11 @@ export function PackageDetails({ id }: PackageDetailsProps) {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-3">
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-blue-600">{packageData.totalBookings}</div>
+                <div className="text-2xl font-bold text-blue-600">{packageData.totalBookings != 0 ? packageData.totalBookings : "No Bookings"}</div>
                 <div className="text-sm text-muted-foreground">Total Bookings</div>
               </div>
               <div className="text-center p-4 border rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{packageData.totalRevenue}</div>
+                <div className="text-2xl font-bold text-green-600">{packageData.totalRevenue != 0 ? packageData.totalRevenue : "No Revenue"}</div>
                 <div className="text-sm text-muted-foreground">Total Revenue</div>
               </div>
               <div className="text-center p-4 border rounded-lg">
@@ -242,8 +242,8 @@ export function PackageDetails({ id }: PackageDetailsProps) {
             <TableBody>
               {packageData.recentBookings.map((booking: any) => (
                 <TableRow key={booking.id}
-                  onClick={() => handleViewBooking(booking.payment.booking_id, 'package')}
-                className="cursor-pointer hover:bg-muted/50 transition"
+                  onClick={() => handleViewBooking(booking._id, 'package')}
+                  className="cursor-pointer hover:bg-muted/50 transition"
                 >
                   <TableCell className="font-medium">{booking.payment.booking_id}</TableCell>
                   <TableCell>{booking.user_info.user_Fname}</TableCell>

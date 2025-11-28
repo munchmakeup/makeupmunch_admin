@@ -8,6 +8,7 @@ import { Separator } from "@/components/ui/separator"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Calendar, MapPin, Phone, Mail, User, Star, Activity } from "lucide-react"
 import { useGetData } from "@/services/queryHooks/useGetData"
+import { useRouter } from "next/navigation"
 
 interface ArtistProfileProps {
   id: string
@@ -16,21 +17,27 @@ interface ArtistProfileProps {
 export function ArtistProfile({ id }: ArtistProfileProps) {
   const [artist, setArtist] = useState<any>(null)
   const [isDataLoading, setIsLoading] = useState(true)
-console.log("Fetching artist data for ID:", id);
+  console.log("Fetching artist data for ID:", id);
 
-    const { data:response , isLoading, isError, error } = useGetData(`artist_${id}`, `admin/getArtistDetailsForAdmin/${id}`)
+  const { data: response, isLoading, isError, error } = useGetData(`artist_${id}`, `admin/getArtistDetailsForAdmin/${id}`)
 
 
   const artistData = response?.data
+  const router = useRouter()
 
   console.log("Artist data fetched:", artistData);
+
+  const handleViewBooking = (id: string, bookingType: "service" | "package") => {
+    console.log("Viewing booking with ID:", id)
+    router.push(`/bookings/${id}?bookingType=${bookingType}`)
+  }
 
   useEffect(() => {
 
     console.log(artistData)
     // Simulate API call to fetch artist details
     setTimeout(() => {
-      
+
       setArtist({
         id: "A-1001",
         name: "Priya Sharma",
@@ -106,15 +113,15 @@ console.log("Fetching artist data for ID:", id);
   if (!artist) {
     return <div>Artist not found</div>
   }
- 
+
 
   if (isError || !artist) {
     return <div className="text-red-500">Failed to load artist data: {error?.message || "Unknown error"}</div>
   }
- 
+
   console.log("artist.specialties", artist.specialties);
-  
-  
+
+
   return (
     <div className="space-y-6">
       <div className="grid gap-6 md:grid-cols-3">
@@ -212,29 +219,29 @@ console.log("Fetching artist data for ID:", id);
       </Card>
 
       <Card>
-  <CardHeader>
-    <CardTitle>Services Offered</CardTitle>
-  </CardHeader>
-  <CardContent>
-    <div className="flex flex-col gap-3">
-      {artistData.services.map((service: any) => (
-        <div key={service._id}>
-          {/* Main service name */}
-          <span className="font-medium text-sm">{service.serviceName}</span>
-          
-          {/* Sub-services */}
-          <div className="flex flex-wrap gap-2 mt-1">
-            {service?.subServices?.map((sub: any) => (
-              <Badge key={sub._id} variant="outline" className="text-xs">
-                {sub.name} - ₹{sub.price}
-              </Badge>
+        <CardHeader>
+          <CardTitle>Services Offered</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-col gap-3">
+            {artistData.services.map((service: any) => (
+              <div key={service._id}>
+                {/* Main service name */}
+                <span className="font-medium text-sm">{service.serviceName}</span>
+
+                {/* Sub-services */}
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {service?.subServices?.map((sub: any) => (
+                    <Badge key={sub._id} variant="outline" className="text-xs">
+                      {sub.name} - ₹{sub.price}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
             ))}
           </div>
-        </div>
-      ))}
-    </div>
-  </CardContent>
-</Card>
+        </CardContent>
+      </Card>
 
       <Card>
         <CardHeader>
@@ -262,27 +269,32 @@ console.log("Fetching artist data for ID:", id);
               <TableRow>
                 <TableHead>Booking ID</TableHead>
                 <TableHead>Customer</TableHead>
-                <TableHead>Package</TableHead>
                 <TableHead>Date</TableHead>
+                <TableHead>Time</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Amount</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {artistData.bookings.map((booking: any) => (
-                <TableRow key={booking.id}>
-                  <TableCell className="font-medium">{booking._id.length >10 ? `${booking._id.slice(0,10)}...` : booking._id7}</TableCell>
-                  <TableCell>{booking.userName.length > 10 ? `${booking.userName.slice(0,10)}...` : booking.userName}</TableCell>
-                  <TableCell>{booking.package}</TableCell>
+                <TableRow key={booking.id}
+                  onClick={() => handleViewBooking(booking._id, 'service')}
+                  className="cursor-pointer hover:bg-muted/50 transition"
+
+                >
+                  <TableCell className="font-medium">{booking._id.length > 10 ? `${booking._id.slice(0, 10)}...` : booking._id7}</TableCell>
+                  <TableCell>{booking.userName.length > 10 ? `${booking.userName.slice(0, 10)}...` : booking.userName}</TableCell>
+
                   <TableCell>{new Date(booking.date).toLocaleDateString()}</TableCell>
+                  <TableCell>{booking.timeSlot}</TableCell>
                   <TableCell>
                     <Badge
-                      variant={booking.status === "confirmed" ? "success" : "destructive"}
+                      variant={booking.status === "confirmed" ? "success" : booking.status === "pending" ? "default" : "destructive"}
                     >
                       {booking.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>{booking.amount ? booking.amount : 0}</TableCell>
+                  <TableCell>{booking.totalAmount ? booking.totalAmount : 0}</TableCell>
                 </TableRow>
               ))}
             </TableBody>

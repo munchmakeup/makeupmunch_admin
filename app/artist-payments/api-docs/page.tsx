@@ -51,7 +51,7 @@ export default function ArtistPaymentAPIDocsPage() {
             <p className="text-sm text-muted-foreground">Total endpoints available</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
@@ -64,7 +64,7 @@ export default function ArtistPaymentAPIDocsPage() {
             <p className="text-sm text-muted-foreground">Database schemas</p>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="flex items-center gap-2">
@@ -101,12 +101,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/artist-payment/bank-details</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Add or update artist bank account details with document upload</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">cURL Example</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`curl -X POST "${baseURL}/artist-payment/bank-details" \\
   -H "Authorization: Bearer \${ARTIST_TOKEN}" \\
@@ -122,7 +122,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`curl -X POST "${baseURL}/artist-payment/bank-details" \\
+                    {`curl -X POST "${baseURL}/artist-payment/bank-details" \\
   -H "Authorization: Bearer \${ARTIST_TOKEN}" \\
   -F "artist_id=\${ARTIST_ID}" \\
   -F "account_holder_name=John Doe" \\
@@ -144,12 +144,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/artist-payment/bank-details/:artist_id</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Retrieve artist's bank account details</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">cURL Example</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`curl -X GET "${baseURL}/artist-payment/bank-details/\${ARTIST_ID}" \\
   -H "Authorization: Bearer \${ARTIST_TOKEN}"`)}
@@ -158,7 +158,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`curl -X GET "${baseURL}/artist-payment/bank-details/\${ARTIST_ID}" \\
+                    {`curl -X GET "${baseURL}/artist-payment/bank-details/\${ARTIST_ID}" \\
   -H "Authorization: Bearer \${ARTIST_TOKEN}"`}
                   </pre>
                 </div>
@@ -179,12 +179,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/artist-payment/withdrawal-request</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Create a new withdrawal request</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Request Body</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`{
   "artist_id": "artist_id_here",
@@ -196,7 +196,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   "artist_id": "artist_id_here",
   "points_to_withdraw": 2000,
   "artist_notes": "Monthly withdrawal request"
@@ -214,12 +214,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/artist-payment/earnings-summary/:artist_id</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Get artist's earnings and points summary</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Response Example</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`{
   "status": true,
@@ -239,7 +239,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   "status": true,
   "message": "Earnings summary fetched successfully",
   "data": {
@@ -273,12 +273,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/admin/artist-payment/verify-bank</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Verify or reject artist bank details</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Request Body</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`{
   "bank_details_id": "bank_details_id_here",
@@ -291,7 +291,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   "bank_details_id": "bank_details_id_here",
   "action": "verify", // or "reject"
   "admin_id": "admin_id_here",
@@ -310,12 +310,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/admin/artist-payment/process-withdrawal</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Approve or reject withdrawal requests</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Request Body</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`{
   "request_id": "WR1234567890123",
@@ -329,7 +329,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   "request_id": "WR1234567890123",
   "action": "approve", // or "reject"
   "admin_id": "admin_id_here",
@@ -349,12 +349,12 @@ export default function ArtistPaymentAPIDocsPage() {
                   <code className="text-sm bg-muted px-2 py-1 rounded">/admin/artist-payment/mark-completed</code>
                 </div>
                 <p className="text-sm text-muted-foreground">Mark withdrawal as completed after bank transfer</p>
-                
+
                 <div className="bg-muted p-4 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Request Body</span>
-                    <Button 
-                      variant="ghost" 
+                    <Button
+                      variant="ghost"
                       size="sm"
                       onClick={() => copyToClipboard(`{
   "request_id": "WR1234567890123",
@@ -368,7 +368,7 @@ export default function ArtistPaymentAPIDocsPage() {
                     </Button>
                   </div>
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   "request_id": "WR1234567890123",
   "admin_id": "admin_id_here",
   "transaction_id": "TXN123456789",
@@ -394,7 +394,7 @@ export default function ArtistPaymentAPIDocsPage() {
                 <h4 className="font-semibold">Artist Bank Details</h4>
                 <div className="bg-muted p-4 rounded-lg">
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   artist_id: ObjectId,
   account_holder_name: String,
   account_number: String,
@@ -423,7 +423,7 @@ export default function ArtistPaymentAPIDocsPage() {
                 <h4 className="font-semibold">Withdrawal Request</h4>
                 <div className="bg-muted p-4 rounded-lg">
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   request_id: String, // Auto-generated WR + timestamp
   artist_id: ObjectId,
   points_to_withdraw: Number,
@@ -459,7 +459,7 @@ export default function ArtistPaymentAPIDocsPage() {
                 <h4 className="font-semibold">Artist Earnings</h4>
                 <div className="bg-muted p-4 rounded-lg">
                   <pre className="text-xs overflow-x-auto">
-{`{
+                    {`{
   artist_id: ObjectId,
   booking_id: ObjectId,
   earning_type: 'booking_completion' | 'loyalty_points' | 'bonus',
@@ -493,8 +493,8 @@ export default function ArtistPaymentAPIDocsPage() {
               <div className="bg-muted p-4 rounded-lg">
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-sm font-medium">test-artist-payments.sh</span>
-                  <Button 
-                    variant="ghost" 
+                  <Button
+                    variant="ghost"
                     size="sm"
                     onClick={() => copyToClipboard(`#!/bin/bash
 
@@ -535,7 +535,7 @@ curl -X POST "\${BASE_URL}/artist-payment/withdrawal-request" \\
     "artist_notes": "Test withdrawal"
   }'
 
-# Test 4: Get Pending Verifications (Admin)
+# Test 4: Get Pending Verifications (Admin)getPaymentDashboardStats
 echo -e "\\n[4] Testing Get Pending Verifications..."
 curl -X GET "\${BASE_URL}/admin/artist-payment/pending-verifications" \\
   -H "Authorization: Bearer \${ADMIN_TOKEN}"
@@ -559,7 +559,7 @@ echo "=========================================="
                   </Button>
                 </div>
                 <pre className="text-xs overflow-x-auto max-h-96">
-{`#!/bin/bash
+                  {`#!/bin/bash
 
 # Variables
 BASE_URL="https://service.app.makeupmunch.in"
@@ -619,7 +619,7 @@ echo "=========================================="
 `}
                 </pre>
               </div>
-              
+
               <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg">
                 <h4 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Usage Instructions</h4>
                 <ol className="text-sm text-blue-800 dark:text-blue-200 space-y-1">

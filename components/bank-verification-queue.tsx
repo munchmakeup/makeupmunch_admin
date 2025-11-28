@@ -28,9 +28,9 @@ interface BankDetails {
   _id: string
   artist_id: {
     _id: string
-    name: string
+    username: string
     email: string
-    profile_image?: string
+    profile_img?: string
   }
   account_holder_name: string
   account_number: string
@@ -42,7 +42,7 @@ interface BankDetails {
     cancelled_cheque?: string
     passbook_front?: string
   }
-  created_at: string
+  createdAt: string
   rejection_reason?: string
 }
 
@@ -66,9 +66,9 @@ export function BankVerificationQueue() {
       _id: "bd1",
       artist_id: {
         _id: "artist1",
-        name: "Sophia Anderson",
+        username: "Sophia Anderson",
         email: "sophia@example.com",
-        profile_image: "/placeholder.svg"
+        profile_img: "/placeholder.svg"
       },
       account_holder_name: "Sophia Anderson",
       account_number: "1234567890",
@@ -80,13 +80,13 @@ export function BankVerificationQueue() {
         cancelled_cheque: "/documents/cheque1.jpg",
         passbook_front: "/documents/passbook1.jpg"
       },
-      created_at: "2024-01-15T10:30:00.000Z"
+      createdAt: "2024-01-15T10:30:00.000Z"
     },
     {
       _id: "bd2",
       artist_id: {
         _id: "artist2",
-        name: "Emma Johnson",
+        username: "Emma Johnson",
         email: "emma@example.com"
       },
       account_holder_name: "Emma Johnson",
@@ -97,17 +97,19 @@ export function BankVerificationQueue() {
       verification_status: "pending",
       documents: {
         cancelled_cheque: "/documents/cheque2.jpg"
+        
       },
-      created_at: "2024-01-14T15:45:00.000Z"
+      createdAt: "2024-01-14T15:45:00.000Z"
     }
   ]
 
-  const displayData = bankDetails?.data || mockBankDetails
+  const displayData = bankDetails?.data.verifications || mockBankDetails
 
   const filteredDetails = displayData.filter((detail: BankDetails) =>
-    detail.artist_id.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    detail.artist_id.username.toLowerCase().includes(searchQuery.toLowerCase()) ||
     detail.account_holder_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    detail.bank_name.toLowerCase().includes(searchQuery.toLowerCase())
+    detail.bank_name.toLowerCase().includes(searchQuery.toLowerCase())||
+    detail.createdAt.toLowerCase().includes(searchQuery.toLowerCase())
   )
 
   const handleVerification = async (action: 'verify' | 'reject') => {
@@ -119,7 +121,7 @@ export function BankVerificationQueue() {
       const payload = {
         bank_details_id: selectedDetails._id,
         action,
-        admin_id: "admin_id_here", // Replace with actual admin ID
+        admin_id: "68488072908128b2b44ce228", // Replace with actual admin ID
         ...(action === 'reject' && { rejection_reason: rejectionReason })
       }
 
@@ -127,7 +129,7 @@ export function BankVerificationQueue() {
       
       toast({
         title: action === 'verify' ? "Bank Details Verified ✅" : "Bank Details Rejected ❌",
-        description: `${selectedDetails.artist_id.name}'s bank details have been ${action}d.`,
+        description: `${selectedDetails.artist_id.username}'s bank details have been ${action}d.`,
       })
 
       setSelectedDetails(null)
@@ -185,13 +187,13 @@ export function BankVerificationQueue() {
                   <TableCell>
                     <div className="flex items-center gap-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={detail.artist_id.profile_image || "/placeholder.svg"} />
+                        <AvatarImage src={detail.artist_id.profile_img || "/placeholder.svg"} />
                         <AvatarFallback>
-                          {detail.artist_id.name.charAt(0).toUpperCase()}
+                          {detail.artist_id.username.charAt(0).toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <div className="font-medium">{detail.artist_id.name}</div>
+                        <div className="font-medium">{detail.artist_id.username}</div>
                         <div className="text-sm text-muted-foreground">
                           {detail.artist_id.email}
                         </div>
@@ -233,10 +235,10 @@ export function BankVerificationQueue() {
                   </TableCell>
                   <TableCell>
                     <div className="text-sm">
-                      {new Date(detail.created_at).toLocaleDateString()}
+                      {/* {new Date(detail.createdAt).toLocaleDateString()} */}
                     </div>
                     <div className="text-xs text-muted-foreground">
-                      {new Date(detail.created_at).toLocaleTimeString()}
+                      {new Date(detail.createdAt).toLocaleString()}
                     </div>
                   </TableCell>
                   <TableCell>
@@ -260,7 +262,7 @@ export function BankVerificationQueue() {
                         <DialogHeader>
                           <DialogTitle>Bank Details Verification</DialogTitle>
                           <DialogDescription>
-                            Review and verify {selectedDetails?.artist_id.name}'s bank account details
+                            Review and verify {selectedDetails?.artist_id.username}'s bank account details
                           </DialogDescription>
                         </DialogHeader>
                         
@@ -269,13 +271,13 @@ export function BankVerificationQueue() {
                             {/* Artist Info */}
                             <div className="flex items-center gap-4 p-4 bg-muted rounded-lg">
                               <Avatar className="h-12 w-12">
-                                <AvatarImage src={selectedDetails.artist_id.profile_image || "/placeholder.svg"} />
+                                <AvatarImage src={selectedDetails.artist_id.profile_img || ""} />
                                 <AvatarFallback>
-                                  {selectedDetails.artist_id.name.charAt(0).toUpperCase()}
+                                  {selectedDetails.artist_id.username.charAt(0).toUpperCase()}
                                 </AvatarFallback>
                               </Avatar>
                               <div>
-                                <div className="font-semibold">{selectedDetails.artist_id.name}</div>
+                                <div className="font-semibold">{selectedDetails.artist_id.username}</div>
                                 <div className="text-sm text-muted-foreground">
                                   {selectedDetails.artist_id.email}
                                 </div>
