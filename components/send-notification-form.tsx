@@ -1,77 +1,69 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import { z } from "zod"
-import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Separator } from "@/components/ui/separator"
-import { useToast } from "@/components/ui/use-toast"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { CalendarIcon, Search } from "lucide-react"
-import { format } from "date-fns"
-import { cn } from "@/lib/utils"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Button } from "@/components/ui/button";
+import {
+  Form,
+  FormControl,
+  FormDescription,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Separator } from "@/components/ui/separator";
+import { useToast } from "@/components/ui/use-toast";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { CalendarIcon, Edit, MoreHorizontal, Search } from "lucide-react";
+import { format } from "date-fns";
+import { cn } from "@/lib/utils";
+import { useGetData } from "@/services/queryHooks/useGetData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { usePostData } from "@/services/queryHooks/usePostData";
+import { title } from "process";
 
 const formSchema = z.object({
   title: z.string().min(2, { message: "Title must be at least 2 characters." }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters." }),
-  recipientType: z.string().min(1, { message: "Please select recipient type." }),
+  message: z
+    .string()
+    .min(10, { message: "Message must be at least 10 characters." }),
+  recipientType: z
+    .string()
+    .min(1, { message: "Please select recipient type." }),
   recipients: z.array(z.string()).optional(),
   scheduledDate: z.date().optional(),
-})
-
-const users = [
-  {
-    id: "user1",
-    name: "Sophia Anderson",
-    email: "sophia@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-    type: "Customer",
-  },
-  {
-    id: "user2",
-    name: "Emma Johnson",
-    email: "emma@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-    type: "Customer",
-  },
-  {
-    id: "user3",
-    name: "Priya Sharma",
-    email: "priya@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-    type: "Artist",
-  },
-  {
-    id: "user4",
-    name: "Neha Patel",
-    email: "neha@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-    type: "Artist",
-  },
-  {
-    id: "user5",
-    name: "Olivia Williams",
-    email: "olivia@example.com",
-    avatar: "/placeholder.svg?height=32&width=32",
-    type: "Customer",
-  },
-]
+});
 
 export function SendNotificationForm() {
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [searchQuery, setSearchQuery] = useState("")
-  const router = useRouter()
-  const { toast } = useToast()
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [cityFilter, setCityFilter] = useState("");
+  const [joinDate, setJoinDate] = useState<Date | null>(null);
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const router = useRouter();
+  const { toast } = useToast();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -81,31 +73,119 @@ export function SendNotificationForm() {
       recipientType: "all",
       recipients: [],
     },
-  })
+  });
 
-  const recipientType = form.watch("recipientType")
-  const selectedRecipients = form.watch("recipients") || []
+  const recipientType = form.watch("recipientType");
 
-  const filteredUsers = users.filter(
-    (user) =>
+  const { data: usersData, isLoading: usersLoading } = useGetData(
+    "getAllUsers",
+    "/admin/getBasicUsersForAdmin",
+    recipientType === "selected_users"
+  );
+
+  // 3) Artists
+  const { data: artistsData, isLoading: artistsLoading } = useGetData(
+    "getAllArtists",
+    "/admin/getBasicArtistsForAdmin",
+    recipientType === "selected_artist"
+  );
+
+  const sendNotification = usePostData("/admin/notifications/send");
+
+  const apiUsers =
+    usersData?.data?.map((user) => ({
+      id: user._id,
+      name: user.username,
+      email: user.email,
+      avatar: user.profile_img || "",
+      type: "Customer",
+      city: user.city || "",
+      joinedDate: user.joinedDate || "",
+    })) || [];
+
+  const apiArtists =
+    artistsData?.data?.map((artist) => ({
+      id: artist._id,
+      name: artist.username,
+      email: artist.email,
+      avatar: artist.profile_img || "",
+      type: "Artist",
+      city: artist.city || "",
+      joinedDate: artist.joinedDate || "",
+    })) || [];
+
+  const filteredList =
+    recipientType === "selected_users"
+      ? apiUsers
+      : recipientType === "selected_artist"
+      ? apiArtists
+      : [];
+
+  const selectedRecipients = form.watch("recipients") || [];
+
+  const filteredUsers = filteredList.filter((user) => {
+    const matchesSearch =
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      user.email.toLowerCase().includes(searchQuery.toLowerCase());
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsSubmitting(true)
+    const matchesCity =
+      cityFilter === "" ||
+      user.city?.toLowerCase().includes(cityFilter.toLowerCase());
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsSubmitting(false)
+    const matchesJoinDate =
+      !joinDate ||
+      format(new Date(user.joinedDate), "yyyy-MM-dd") ===
+        format(joinDate, "yyyy-MM-dd");
+
+    return matchesSearch && matchesCity && matchesJoinDate;
+  });
+
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsSubmitting(true);
+
+    try {
+      // BACKEND KO JANE WALA JSON BODY
+      const payload = {
+        type: "tokens",
+        tokens: [
+          "e-W-vBmF2v9041asR9-uDd:APA91bFMK795rGzcKO_6tyaxES-Cyl84Xzf9ErWkAjcqQAiS0Y2SsYKqBc4E2hgZt5ZQy7sI0k5InRL6XAuE7AC7t_q9mba2B--aDgtMYg14hMQaU0xwFcQ",
+          "d_HBV4FlPHAEqXJsAmFwtn:APA91bGGmQOYIfy7ajj-LlN4x6t8VO6mFUECUHnaNfmC1ZJbQ3LsTUSw3vXk_nieeflHnbttCbo-w6a6dJKt2vgNlw47HO7yBL_mVMTuOeoITYTli0hVlN4",
+        ], // <-- Tumhare selected users ke IDs
+        payload: {
+          data: {
+            title: values.title,
+            body: values.message,
+            image: "https://example.com/sample.jpg", // agar form se lena ho to alag field banao
+            screen: "booking-details",
+            bookingId: "12345",
+          },
+        },
+        meta: {
+          screen: "booking-details",
+          bookingId: "12345",
+          adminId: "121212",
+        },
+      };
+
+      // API CALL USING REACT QUERY
+      const res = await sendNotification.mutateAsync(payload);
+
       toast({
-        title: "Notification sent successfully",
-        description: values.scheduledDate
-          ? `Your notification has been scheduled for ${format(values.scheduledDate, "PPP")}.`
-          : "Your notification has been sent to the selected recipients.",
-      })
-      router.push("/notifications")
-    }, 1500)
+        title: "Notification Sent!",
+        description: "Your notification is successfully delivered.",
+      });
+
+      router.push("/notifications");
+    } catch (error) {
+      console.error(error);
+      toast({
+        variant: "destructive",
+        title: "Failed to send notification",
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (
@@ -134,9 +214,15 @@ export function SendNotificationForm() {
             <FormItem>
               <FormLabel>Message</FormLabel>
               <FormControl>
-                <Textarea placeholder="Enter notification message" className="min-h-[120px]" {...field} />
+                <Textarea
+                  placeholder="Enter notification message"
+                  className="min-h-[120px]"
+                  {...field}
+                />
               </FormControl>
-              <FormDescription>Keep the message clear and concise for better engagement.</FormDescription>
+              <FormDescription>
+                Keep the message clear and concise for better engagement.
+              </FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -153,9 +239,14 @@ export function SendNotificationForm() {
                   <FormControl>
                     <Button
                       variant={"outline"}
-                      className={cn("w-full pl-3 text-left font-normal", !field.value && "text-muted-foreground")}
+                      className={cn(
+                        "w-full pl-3 text-left font-normal",
+                        !field.value && "text-muted-foreground"
+                      )}
                     >
-                      {field.value ? format(field.value, "PPP") : "Schedule for later"}
+                      {field.value
+                        ? format(field.value, "PPP")
+                        : "Schedule for later"}
                       <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
                     </Button>
                   </FormControl>
@@ -171,7 +262,8 @@ export function SendNotificationForm() {
                 </PopoverContent>
               </Popover>
               <FormDescription>
-                Leave empty to send immediately, or select a date to schedule for later.
+                Leave empty to send immediately, or select a date to schedule
+                for later.
               </FormDescription>
               <FormMessage />
             </FormItem>
@@ -203,7 +295,9 @@ export function SendNotificationForm() {
                       <FormControl>
                         <RadioGroupItem value="customers" />
                       </FormControl>
-                      <FormLabel className="font-normal">All Customers</FormLabel>
+                      <FormLabel className="font-normal">
+                        All Customers
+                      </FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
@@ -215,13 +309,26 @@ export function SendNotificationForm() {
                       <FormControl>
                         <RadioGroupItem value="featured_artists" />
                       </FormControl>
-                      <FormLabel className="font-normal">Featured Artists</FormLabel>
+                      <FormLabel className="font-normal">
+                        Featured Artists
+                      </FormLabel>
                     </FormItem>
                     <FormItem className="flex items-center space-x-3 space-y-0">
                       <FormControl>
-                        <RadioGroupItem value="specific" />
+                        <RadioGroupItem value="selected_users" />
                       </FormControl>
-                      <FormLabel className="font-normal">Specific Users</FormLabel>
+                      <FormLabel className="font-normal">
+                        Selected Users
+                      </FormLabel>
+                    </FormItem>
+
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="selected_artist" />
+                      </FormControl>
+                      <FormLabel className="font-normal">
+                        Selected Artists
+                      </FormLabel>
                     </FormItem>
                   </RadioGroup>
                 </FormControl>
@@ -230,18 +337,76 @@ export function SendNotificationForm() {
             )}
           />
 
-          {recipientType === "specific" && (
+          {(recipientType === "selected_users" ||
+            recipientType === "selected_artist") && (
             <div className="space-y-4">
-              <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  type="search"
-                  placeholder="Search users..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* CITY FILTER */}
+                <div>
+                  <Input
+                    placeholder="Filter by city..."
+                    value={cityFilter}
+                    onChange={(e) => setCityFilter(e.target.value)}
+                  />
+                </div>
+
+                {/* JOIN DATE FILTER */}
+                <div>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start"
+                      >
+                        {joinDate
+                          ? format(joinDate, "PPP")
+                          : "Filter by Join Date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent>
+                      <Calendar
+                        mode="single"
+                        selected={joinDate}
+                        onSelect={setJoinDate}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+                {recipientType === "selected_users" && (
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="active">No Booking</SelectItem>
+                      <SelectItem value="inactive">1 Booking</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                {recipientType === "selected_artist" && (
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="active">No Services Added</SelectItem>
+                      <SelectItem value="inactive">1 Service added</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
+                <div></div>
               </div>
+
+              <FormDescription>
+                Showing {filteredUsers.length} of{" "}
+                {recipientType === "selected_users"
+                  ? apiUsers.length
+                  : apiArtists.length}
+                {recipientType === "selected_users" ? "Users" : "Artists"} —
+                Select the recipients below.
+              </FormDescription>
 
               <div className="border rounded-md p-4 space-y-4">
                 <FormField
@@ -257,32 +422,56 @@ export function SendNotificationForm() {
                             name="recipients"
                             render={({ field }) => {
                               return (
-                                <FormItem key={user.id} className="flex items-center space-x-3 space-y-0">
+                                <FormItem
+                                  key={user.id}
+                                  className="flex items-center space-x-3 space-y-0"
+                                >
                                   <FormControl>
                                     <Checkbox
                                       checked={field.value?.includes(user.id)}
                                       onCheckedChange={(checked) => {
                                         return checked
-                                          ? field.onChange([...(field.value || []), user.id])
-                                          : field.onChange(field.value?.filter((value) => value !== user.id))
+                                          ? field.onChange([
+                                              ...(field.value || []),
+                                              user.id,
+                                            ])
+                                          : field.onChange(
+                                              field.value?.filter(
+                                                (value) => value !== user.id
+                                              )
+                                            );
                                       }}
                                     />
                                   </FormControl>
-                                  <div className="flex items-center gap-2">
+                                  <div
+                                    className="flex items-center gap-2 cursor-pointer hover:bg-accent p-2 rounded-md"
+                                    onClick={() =>
+                                      router.push(`/artists/${user.id}`)
+                                    }
+                                  >
                                     <Avatar className="h-8 w-8">
-                                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                                      <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
+                                      <AvatarImage
+                                        src={user.avatar || ""}
+                                        alt={user.name}
+                                      />
+                                      <AvatarFallback>
+                                        {user.name.charAt(0).toUpperCase()}
+                                      </AvatarFallback>
                                     </Avatar>
                                     <div className="flex flex-col">
-                                      <span className="text-sm font-medium">{user.name}</span>
-                                      <span className="text-xs text-muted-foreground">{user.email}</span>
+                                      <span className="text-sm font-medium">
+                                        {user.name}
+                                      </span>
+                                      <span className="text-xs text-muted-foreground">
+                                        {user.email}
+                                      </span>
                                     </div>
                                     <Badge variant="outline" className="ml-2">
-                                      {user.type}
+                                      {user.city}
                                     </Badge>
                                   </div>
                                 </FormItem>
-                              )
+                              );
                             }}
                           />
                         ))}
@@ -295,7 +484,8 @@ export function SendNotificationForm() {
 
               {selectedRecipients.length > 0 && (
                 <div className="text-sm text-muted-foreground">
-                  {selectedRecipients.length} recipient{selectedRecipients.length !== 1 ? "s" : ""} selected
+                  {selectedRecipients.length} recipient
+                  {selectedRecipients.length !== 1 ? "s" : ""} selected
                 </div>
               )}
             </div>
@@ -303,14 +493,26 @@ export function SendNotificationForm() {
         </div>
 
         <div className="flex justify-end gap-4">
-          <Button variant="outline" type="button" onClick={() => router.push("/notifications")}>
+          <Button
+            variant="outline"
+            type="button"
+            onClick={() => router.push("/notifications")}
+          >
             Cancel
           </Button>
-          <Button type="submit" className="bg-pink-600 hover:bg-pink-700" disabled={isSubmitting}>
-            {isSubmitting ? "Sending..." : form.getValues("scheduledDate") ? "Schedule" : "Send Now"}
+          <Button
+            type="submit"
+            className="bg-pink-600 hover:bg-pink-700"
+            disabled={isSubmitting}
+          >
+            {isSubmitting
+              ? "Sending..."
+              : form.getValues("scheduledDate")
+              ? "Schedule"
+              : "Send Now"}
           </Button>
         </div>
       </form>
     </Form>
-  )
+  );
 }

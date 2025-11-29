@@ -101,26 +101,34 @@ export function SendEmailForm() {
 
 
 
-  const { data, isLoading, isError, error } = useGetData("getTemplates", "/admin/getTemplates")
+  const { data, isLoading, isError, error } = useGetData("getTemplates", "/admin/getTemplates");
 
-  const {
-    data: usersData,
-    isLoading: usersLoading,
-    isError: usersError,
-    error: usersErr,
-  } = useGetData("getAllUsers", "/admin/getBasicUsersForAdmin");
+  const recipientType = form.watch("recipientType")
+
+
+const {
+  data: usersData,
+  isLoading: usersLoading,
+} = useGetData(
+  "getAllUsers",
+  "/admin/getBasicUsersForAdmin",
+  recipientType === "selected_users"
+)
+
 
   // 3) Artists
-  const {
-    data: artistsData,
-    isLoading: artistsLoading,
-    isError: artistsError,
-    error: artistsErr,
-  } = useGetData("getAllArtists", "/admin/getBasicArtistsForAdmin");
+const {
+  data: artistsData,
+  isLoading: artistsLoading,
+} = useGetData(
+  "getAllArtists",
+  "/admin/getBasicArtistsForAdmin",
+  recipientType === "selected_artist"
+)
+
 
   const emailTemplates = data?.data?.templateObject ? Object.values(data.data.templateObject) : [];
 
-  const recipientType = form.watch("recipientType")
   const selectedRecipients = form.watch("recipients") || []
   const selectedTemplate = form.watch("template")
 

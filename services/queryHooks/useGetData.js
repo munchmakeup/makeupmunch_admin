@@ -1,10 +1,11 @@
 import { useQuery,useInfiniteQuery } from "@tanstack/react-query";
 import { getData } from "../apiService";
 
-export const useGetData = (key, url, params = {}) => {
+export const useGetData = (key, url, enabled=true , params = {}) => {
   return useQuery({
     queryKey: [key, params], // This is the new way to pass query keys in React Query v5
     queryFn: () => getData(url, params), // The function that fetches the data
+    enabled
   });
 };
 
