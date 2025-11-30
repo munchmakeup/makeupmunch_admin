@@ -16,64 +16,33 @@ import {
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Edit, MoreHorizontal, Search, Trash2, UserX } from "lucide-react"
+import { useGetData } from "@/services/queryHooks/useGetData"
+import { usePutData } from "@/services/queryHooks/usePutData"
+import { useToast } from "./ui/use-toast"
+import { useRouter } from "next/navigation"
 
-const admins = [
-  {
-    id: 1,
-    name: "Rahul Sharma",
-    email: "rahul@makeupmunch.in",
-    avatar: "/placeholder.svg?height=32&width=32",
-    role: "Super Admin",
-    status: "Active",
-    lastActive: "2023-06-23T10:23:45",
-  },
-  {
-    id: 2,
-    name: "Anita Desai",
-    email: "anita@makeupmunch.in",
-    avatar: "/placeholder.svg?height=32&width=32",
-    role: "Admin",
-    status: "Active",
-    lastActive: "2023-06-23T09:45:12",
-  },
-  {
-    id: 3,
-    name: "Vikram Singh",
-    email: "vikram@makeupmunch.in",
-    avatar: "/placeholder.svg?height=32&width=32",
-    role: "Admin",
-    status: "Active",
-    lastActive: "2023-06-23T08:30:00",
-  },
-  {
-    id: 4,
-    name: "Deepa Patel",
-    email: "deepa@makeupmunch.in",
-    avatar: "/placeholder.svg?height=32&width=32",
-    role: "Admin",
-    status: "Inactive",
-    lastActive: "2023-06-20T15:10:30",
-  },
-  {
-    id: 5,
-    name: "Sanjay Kumar",
-    email: "sanjay@makeupmunch.in",
-    avatar: "/placeholder.svg?height=32&width=32",
-    role: "Admin",
-    status: "Active",
-    lastActive: "2023-06-22T14:25:00",
-  },
-]
+
 
 export function AdminList() {
   const [searchQuery, setSearchQuery] = useState("")
-  const [selectedAdmins, setSelectedAdmins] = useState<number[]>([])
+  const [selectedAdmins, setSelectedAdmins] = useState<number[]>([]);
+  const [makeDeactiveId , setMakeDeactiveId] = useState(null)
 
-  const filteredAdmins = admins.filter(
+  const { toast} = useToast();
+  const router = useRouter();
+    const { data:adminData, isError, isLoading, error } = useGetData("getAllAdmin", "admin/allAdmin");
+
+    const admins = adminData?.data.admins
+
+
+    console.log("adminData",admins)
+  
+
+  const filteredAdmins = admins?.filter(
     (admin) =>
-      admin.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      admin.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      admin.role.toLowerCase().includes(searchQuery.toLowerCase()),
+      admin?.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin?.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      admin?.role.toLowerCase().includes(searchQuery.toLowerCase()),
   )
 
   const toggleSelectAll = () => {
@@ -91,6 +60,29 @@ export function AdminList() {
       setSelectedAdmins([...selectedAdmins, id])
     }
   }
+  
+    const { mutate: inactiveAdmin, isPending: isUpdating } = usePutData(`/admin/inactivate/${makeDeactiveId}`)
+
+    const deActivateAdmin = (id)=>{
+
+      inactiveAdmin(id, {
+      onSuccess: (response) => {
+        toast({
+          title: "Admin Deactivate successfully",
+          description: ` has been updated.`,
+        })
+        router.push(`/packages/${id}`)
+      },
+      onError: (error: any) => {
+        toast({
+          title: "Error updating package",
+          description: error?.message || "Something went wrong. Please try again.",
+          variant: "destructive",
+        })
+      },
+    })
+    }
+  
 
   return (
     <div className="space-y-4">
@@ -122,7 +114,7 @@ export function AdminList() {
             <TableRow>
               <TableHead className="w-[40px]">
                 <Checkbox
-                  checked={selectedAdmins.length === filteredAdmins.length && filteredAdmins.length > 0}
+                  checked={selectedAdmins?.length === filteredAdmins?.length && filteredAdmins?.length > 0}
                   onCheckedChange={toggleSelectAll}
                   aria-label="Select all"
                 />
@@ -135,7 +127,7 @@ export function AdminList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredAdmins.map((admin) => (
+            {filteredAdmins?.map((admin) => (
               <TableRow key={admin.id}>
                 <TableCell>
                   <Checkbox
@@ -166,13 +158,13 @@ export function AdminList() {
                 </TableCell>
                 <TableCell>
                   <Badge
-                    variant={admin.status === "Active" ? "default" : "secondary"}
-                    className={admin.status === "Active" ? "bg-green-500 hover:bg-green-600" : ""}
+                    variant={admin.status === "active" ? "default" : "secondary"}
+                    className={admin.status === "active" ? "bg-green-500 hover:bg-green-600" : ""}
                   >
                     {admin.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{new Date(admin.lastActive).toLocaleString()}</TableCell>
+                <TableCell>{new Date(admin.createdAt).toLocaleString()}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -190,7 +182,7 @@ export function AdminList() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <UserX className="mr-2 h-4 w-4" />
-                        <span>{admin.status === "Active" ? "Deactivate" : "Activate"}</span>
+                        <span onClick={deActivateAdmin(admin?._id)}>{admin.status === "active" ? "Deactivate" : "Activate"}</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">

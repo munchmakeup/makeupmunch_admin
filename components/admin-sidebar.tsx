@@ -20,6 +20,7 @@ import {
   Star,
   User,
   UserCog,
+  UserCog2,
   Users,
 } from "lucide-react"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -96,6 +97,14 @@ const handleLogout = () => {
                 <Link href="/dashboard">
                   <LayoutDashboard className="h-4 w-4" />
                   <span>Dashboard</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild isActive={isActive("/admin-management")}>
+                <Link href="/admin-management">
+                  <UserCog2 className="h-4 w-4" />
+                  <span>Admin Management</span>
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>

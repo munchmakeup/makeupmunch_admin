@@ -107,7 +107,7 @@ export function SendNotificationForm() {
   const allguestUsers = guestUsers?.data;
 
   console.log("allguestUsers", allguestUsers);
-  const sendNotification = usePostData("/admin/notifications/send");
+  const sendNotification = usePostData("/admin/bulk/Notifications/send");
 
   const apiUsers =
     usersData?.data?.map((user) => ({
