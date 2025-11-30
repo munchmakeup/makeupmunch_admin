@@ -50,6 +50,7 @@ import {
 import { ThemeToggle } from "@/components/theme-toggle"
 import { useRouter } from "next/navigation"
 import Cookies from "js-cookie"
+import { usePostData } from "@/services/queryHooks/usePostData"
 
 export function AdminSidebar() {
   const pathname = usePathname()
@@ -61,10 +62,45 @@ export function AdminSidebar() {
 
 const router = useRouter()
 
+const { mutate: logoutAdmin } = usePostData("/admin/logout");
+ 
+
+// const handleLogout = () => {
+//   Cookies.remove("authUser") // clear the login cookie
+//   router.push("/login") // redirect to login page
+// }
+
+
 const handleLogout = () => {
-  Cookies.remove("authUser") // clear the login cookie
-  router.push("/login") // redirect to login page
-}
+  const adminId = Cookies.get("adminId");
+
+  
+  logoutAdmin(
+    {},
+    {
+      onSuccess: () => {
+        Cookies.remove("authToken"); // remove token
+        Cookies.remove("authUser");  // if you use this also
+      Cookies.remove("adminId");
+
+        // toast({
+        //   title: "Logged out",
+        //   description: "You have been logged out successfully.",
+        // });
+
+        router.push("/login");
+      },
+
+      onError: (error: any) => {
+        // toast({
+        //   variant: "destructive",
+        //   title: "Logout failed",
+        //   description: error?.response?.data?.message || "Something went wrong",
+        // });
+      }
+    }
+  );
+};
 
 
   return (

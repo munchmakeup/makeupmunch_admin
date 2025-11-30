@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
 import { useGetData } from "@/services/queryHooks/useGetData"
 import Cookies from "js-cookie"
+import { usePostData } from "@/services/queryHooks/usePostData"
 
 export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false)
@@ -25,75 +26,77 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
   const { toast } = useToast()
+const [loginError, setLoginError] = useState<string | null>(null);
 
-  // const handleLogin = async (e: React.FormEvent) => {
-  //   e.preventDefault()
-  //   setIsLoading(true)
 
-  //   // Simulate API call
-  //   setTimeout(() => {
-  //     setIsLoading(false)
-  //     console.log("Email:", email, "Password:", password) // For debugging
-  //     if (email === "admin@makeupmunch.in" && password === "password") {
-  //     console.log("Login successful");
+  const { mutate: loginAdmin } = usePostData("/admin/login");
 
-  //        Cookies.set('authUser', 'true', { expires: 1 }) 
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
 
-  //       // Simulate successful login
-  //       toast({
-  //         title: "Login successful",
-  //         description: "Welcome back to MakeupMunch Admin",
-  //       })
-  //       router.push("/dashboard")
-  //     } else {
+    const deviceInfo = navigator.userAgent;
 
-  //       console.log("Login failed");
-  //       toast({
-  //         variant: "destructive",
-  //         title: "Login failed",
-  //         description: "Invalid email or password. Please try again.",
-  //       })
-  //     }
-  //   }, 1500)
-  // }
+    loginAdmin(
 
-const handleLogin = async (e: React.FormEvent) => {
-  e.preventDefault()
-  setIsLoading(true)
+ 
+      { email, password, deviceInfo },
 
-  // Simulate fake API delay
-  await new Promise((res) => setTimeout(res, 1500))
+      {
+        
+        onSuccess: (response: any) => {
+     setLoginError("");
 
-  if (email === "admin@makeupmunch.in" && password === "password") {
-    Cookies.set('authUser', 'true', { expires: 1 })
+          toast({
+            title: "Login successful",
+            description: "Welcome to MakeupMunch Admin Panel",
+          });
 
-    toast({
-      title: "Login successful",
-      description: "Welcome back to MakeupMunch Admin",
-    })
+          // Store token from API
+          // Cookies.set("authToken", response.data.token, { expires: 7 });
 
-    router.push("/dashboard")
-  } else {
-    toast({
-      variant: "destructive",
-      title: "Login failed",
-      description: "Invalid email or password. Please try again.",
-    })
-  }
+          Cookies.set("authUser", "true", { expires: 7 });
+          Cookies.set("authToken", response.data.token, { expires: 7 });
+          Cookies.set("adminId", response.data.id, { expires: 7 });
 
-  setIsLoading(false)
-}
 
-  const {
-    data: UsersData,
-    isLoading: UsersLoading,
-    isError: UsersisError,
-    error: UsersError,
-    // refetch: fetchLocation
-  } = useGetData(
-    "getAllUsers",
-    `/getAllUsers`,
-  );
+
+          console.log("Login successful, token stored.");
+          router.push("/dashboard");
+          console.log("Response:");
+
+
+          setIsLoading(false);
+        },
+
+        onError: (error: any) => {
+
+          const backendMessage =
+            error?.response?.data?.message ||
+            error?.response?.data?.error ||
+            "Invalid credentials";
+
+
+
+          toast({
+            variant: "destructive",
+            title: "Login failed",
+            description:
+              error?.response?.data?.message ||
+              error?.message ||
+              "Invalid credentials"
+          });
+            setLoginError(backendMessage);
+
+
+          setIsLoading(false);
+        },
+      }
+    );
+  };
+
+
+
 
 
   return (
@@ -175,6 +178,13 @@ const handleLogin = async (e: React.FormEvent) => {
                       Remember me for 30 days
                     </Label>
                   </div>
+
+                  {loginError && (
+  <p className="text-red-500 text-sm mt-2 flex justify-center">
+    {loginError}
+  </p>
+)}
+
                 </CardContent>
                 <CardFooter>
                   <Button type="submit" className="w-full bg-pink-600 hover:bg-pink-700" disabled={isLoading}>
@@ -225,3 +235,14 @@ const handleLogin = async (e: React.FormEvent) => {
     </div>
   )
 }
+
+// const {
+//   data: UsersData,
+//   isLoading: UsersLoading,
+//   isError: UsersisError,
+//   error: UsersError,
+//   // refetch: fetchLocation
+// } = useGetData(
+//   "getAllUsers",
+//   `/getAllUsers`,
+// );
