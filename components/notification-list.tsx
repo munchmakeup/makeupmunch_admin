@@ -1,9 +1,9 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { useState } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,105 +11,108 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Bell, Edit, MoreHorizontal, Search, Send, Trash2 } from "lucide-react"
-
-const notifications = [
-  {
-    id: "N-1001",
-    title: "New Booking Offer",
-    message: "Get 20% off on your next bridal makeup booking!",
-    type: "Promotional",
-    target: "All Users",
-    sentDate: "2023-06-23T10:23:45",
-    status: "Sent",
-    openRate: "68%",
-  },
-  {
-    id: "N-1002",
-    title: "Artist Application Approved",
-    message: "Congratulations! Your artist application has been approved.",
-    type: "System",
-    target: "Specific Artist",
-    sentDate: "2023-06-24T09:45:12",
-    status: "Sent",
-    openRate: "100%",
-  },
-  {
-    id: "N-1003",
-    title: "New Feature Announcement",
-    message: "We've added new features to our app! Check them out now.",
-    type: "Announcement",
-    target: "All Users & Artists",
-    sentDate: "2023-06-25T08:30:00",
-    status: "Scheduled",
-    openRate: "N/A",
-  },
-  {
-    id: "N-1004",
-    title: "Booking Confirmation",
-    message: "Your booking for HD Makeup on June 30th has been confirmed.",
-    type: "Transactional",
-    target: "Specific User",
-    sentDate: "2023-06-26T07:15:30",
-    status: "Sent",
-    openRate: "100%",
-  },
-  {
-    id: "N-1005",
-    title: "Payment Reminder",
-    message: "Reminder: Your payment for the booking B-1005 is due tomorrow.",
-    type: "Transactional",
-    target: "Specific User",
-    sentDate: "2023-06-27T16:45:00",
-    status: "Sent",
-    openRate: "75%",
-  },
-  {
-    id: "N-1006",
-    title: "Weekend Special Offer",
-    message: "Book any makeup service this weekend and get a free touch-up kit!",
-    type: "Promotional",
-    target: "All Users",
-    sentDate: "2023-06-28T14:20:00",
-    status: "Draft",
-    openRate: "N/A",
-  },
-]
+} from "@/components/ui/dropdown-menu";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Bell, Edit, MoreHorizontal, Search, Send, Trash2 } from "lucide-react";
+import { useGetData } from "@/services/queryHooks/useGetData";
+import { useDeleteData } from "@/services/queryHooks/useDeleteData";
+import { useToast } from "@/components/ui/use-toast";
 
 export function NotificationList() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [typeFilter, setTypeFilter] = useState("all")
-  const [statusFilter, setStatusFilter] = useState("all")
-  const [selectedNotifications, setSelectedNotifications] = useState<string[]>([])
+  const [searchQuery, setSearchQuery] = useState("");
+  const [typeFilter, setTypeFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [selectedNotifications, setSelectedNotifications] = useState<string[]>(
+    []
+  );
 
-  const filteredNotifications = notifications.filter(
+  const { toast } = useToast();
+
+  const {
+    data: notificationData,
+    isLoading: notificationLoading,
+    isError: notificationisError,
+    error: notificationError,
+    refetch: onDeleteRefetch,
+  } = useGetData(
+    "getAllNotification",
+    `/admin/notifications/logs?page=1&limit=20`
+  );
+
+  console.log("notificationData", notificationData?.data);
+
+  const notifications = notificationData?.data;
+
+  const filteredNotifications = notifications?.filter(
     (notification) =>
-      (notification.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        notification.message.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        notification.target.toLowerCase().includes(searchQuery.toLowerCase())) &&
-      (typeFilter === "all" || notification.type.toLowerCase() === typeFilter.toLowerCase()) &&
-      (statusFilter === "all" || notification.status.toLowerCase() === statusFilter.toLowerCase()),
-  )
+      (notification.payload.data.title
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
+        notification.payload.data.body
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        notification?.target
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())) &&
+      // (typeFilter === "all" || notification.type.toLowerCase() === typeFilter.toLowerCase()) &&
+      (statusFilter === "all" ||
+        notification.status.toLowerCase() === statusFilter.toLowerCase())
+  );
 
   const toggleSelectAll = () => {
     if (selectedNotifications.length === filteredNotifications.length) {
-      setSelectedNotifications([])
+      setSelectedNotifications([]);
     } else {
-      setSelectedNotifications(filteredNotifications.map((notification) => notification.id))
+      setSelectedNotifications(
+        filteredNotifications.map((notification) => notification.id)
+      );
     }
-  }
+  };
 
   const toggleSelectNotification = (id: string) => {
     if (selectedNotifications.includes(id)) {
-      setSelectedNotifications(selectedNotifications.filter((notificationId) => notificationId !== id))
+      setSelectedNotifications(
+        selectedNotifications.filter((notificationId) => notificationId !== id)
+      );
     } else {
-      setSelectedNotifications([...selectedNotifications, id])
+      setSelectedNotifications([...selectedNotifications, id]);
     }
-  }
+  };
+
+  const { mutate } = useDeleteData("/admin/delete/notifications/logs");
+
+  const deleteSelected = () => {
+    console.log("selectedNotifications", selectedNotifications);
+    mutate(
+      { ids: selectedNotifications },
+      {
+        onSuccess: () => {
+          onDeleteRefetch();
+          setSelectedNotifications([]);
+          toast({
+            title: "Deleted Selected Notification",
+            description: "Notification Successfully Deleted",
+          });
+        },
+        onError(error, variables, context) {},
+      }
+    );
+  };
 
   return (
     <div className="space-y-4">
@@ -125,7 +128,7 @@ export function NotificationList() {
               onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          <Select value={typeFilter} onValueChange={setTypeFilter}>
+          {/* <Select value={typeFilter} onValueChange={setTypeFilter}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by type" />
             </SelectTrigger>
@@ -136,16 +139,16 @@ export function NotificationList() {
               <SelectItem value="announcement">Announcement</SelectItem>
               <SelectItem value="transactional">Transactional</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="w-full sm:w-[180px]">
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="sent">Sent</SelectItem>
-              <SelectItem value="scheduled">Scheduled</SelectItem>
-              <SelectItem value="draft">Draft</SelectItem>
+              <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="queued">Queued</SelectItem>
+              <SelectItem value="failed">Failed</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -156,7 +159,12 @@ export function NotificationList() {
                 <Send className="h-4 w-4" />
                 <span>Send Selected</span>
               </Button>
-              <Button variant="outline" size="sm" className="h-8 gap-1">
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-8 gap-1"
+                onClick={deleteSelected}
+              >
                 <Trash2 className="h-4 w-4" />
                 <span>Delete Selected</span>
               </Button>
@@ -171,7 +179,9 @@ export function NotificationList() {
               <TableHead className="w-[40px]">
                 <Checkbox
                   checked={
-                    selectedNotifications.length === filteredNotifications.length && filteredNotifications.length > 0
+                    selectedNotifications?.length ===
+                      filteredNotifications?.length &&
+                    filteredNotifications?.length > 0
                   }
                   onCheckedChange={toggleSelectAll}
                   aria-label="Select all"
@@ -188,69 +198,71 @@ export function NotificationList() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredNotifications.map((notification) => (
-              <TableRow key={notification.id}>
+            {filteredNotifications?.map((notification) => (
+              <TableRow key={notification._id}>
                 <TableCell>
                   <Checkbox
-                    checked={selectedNotifications.includes(notification.id)}
-                    onCheckedChange={() => toggleSelectNotification(notification.id)}
-                    aria-label={`Select ${notification.id}`}
+                    checked={selectedNotifications.includes(notification._id)}
+                    onCheckedChange={() =>
+                      toggleSelectNotification(notification._id)
+                    }
+                    aria-label={`Select ${notification._id}`}
                   />
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    <Bell className="h-4 w-4 text-pink-500" />
-                    <span className="font-medium">{notification.title}</span>
+                    <span className="font-medium">
+                      {notification.payload.data.title}
+                    </span>
                   </div>
                 </TableCell>
                 <TableCell>
-                  <div className="max-w-[200px] truncate" title={notification.message}>
-                    {notification.message}
+                  <div
+                    className="max-w-[200px] truncate"
+                    title={notification.payload.data.body}
+                  >
+                    {notification.payload.data.body}
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge
                     variant="outline"
-                    className={
-                      notification.type === "Promotional"
-                        ? "border-pink-500 text-pink-500"
-                        : notification.type === "System"
-                          ? "border-blue-500 text-blue-500"
-                          : notification.type === "Announcement"
-                            ? "border-purple-500 text-purple-500"
-                            : "border-green-500 text-green-500"
-                    }
+                    // className={
+                    //   notification.type === "Promotional"
+                    //     ? "border-pink-500 text-pink-500"
+                    //     : notification.type === "System"
+                    //       ? "border-blue-500 text-blue-500"
+                    //       : notification.type === "Announcement"
+                    //         ? "border-purple-500 text-purple-500"
+                    //         : "border-green-500 text-green-500"
+                    // }
                   >
-                    {notification.type}
+                    {notification.meta.screen}
                   </Badge>
                 </TableCell>
                 <TableCell>{notification.target}</TableCell>
                 <TableCell>
-                  {notification.status === "Scheduled" || notification.status === "Draft"
+                  {notification.status === "Scheduled" ||
+                  notification.status === "Draft"
                     ? "N/A"
-                    : new Date(notification.sentDate).toLocaleString()}
+                    : new Date(notification.completedAt).toLocaleString()}
                 </TableCell>
                 <TableCell>
                   <Badge
                     variant={
-                      notification.status === "Sent"
-                        ? "default"
-                        : notification.status === "Scheduled"
-                          ? "outline"
-                          : "secondary"
-                    }
-                    className={
-                      notification.status === "Sent"
-                        ? "bg-green-500 hover:bg-green-600"
-                        : notification.status === "Scheduled"
-                          ? "border-yellow-500 text-yellow-500"
-                          : ""
+                      notification.status === "queued"
+                        ? "outline"
+                        : notification.status === "completed"
+                        ? "success"
+                        : notification.status === "scheduled"
+                        ? "secondary"
+                        : "destructive"
                     }
                   >
                     {notification.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{notification.openRate}</TableCell>
+                <TableCell>{"0"}</TableCell>
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
@@ -262,7 +274,8 @@ export function NotificationList() {
                     <DropdownMenuContent align="end">
                       <DropdownMenuLabel>Actions</DropdownMenuLabel>
                       <DropdownMenuSeparator />
-                      {(notification.status === "Draft" || notification.status === "Scheduled") && (
+                      {(notification.status === "Draft" ||
+                        notification.status === "Scheduled") && (
                         <DropdownMenuItem>
                           <Edit className="mr-2 h-4 w-4" />
                           <span>Edit</span>
@@ -288,5 +301,5 @@ export function NotificationList() {
         </Table>
       </div>
     </div>
-  )
+  );
 }
