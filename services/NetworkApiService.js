@@ -1,4 +1,5 @@
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
@@ -23,6 +24,16 @@ const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+
+  if (typeof window !== "undefined") {
+      const token = Cookies.get("authToken");
+      if (token) {
+        config.headers["Authorization"] = `Bearer ${token}`;
+      }
+    }
+ 
+
+
     // Check if data is a FormData object
     console.log("application/json");
     console.log("API_BASE_URL used:", API_BASE_URL);
