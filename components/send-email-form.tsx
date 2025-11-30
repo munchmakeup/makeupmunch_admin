@@ -408,6 +408,13 @@ const {
                       <FormLabel className="font-normal">Selected Artists</FormLabel>
                     </FormItem>
 
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="guest_users" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Guest Users</FormLabel>
+                    </FormItem>
+
                   </RadioGroup>
                 </FormControl>
                 <FormMessage />

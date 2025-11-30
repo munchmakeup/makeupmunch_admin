@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
+import { date, z } from "zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -30,7 +30,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { CalendarIcon, Edit, MoreHorizontal, Search } from "lucide-react";
-import { format } from "date-fns";
+import { format, subMonths } from "date-fns";
 import { cn } from "@/lib/utils";
 import { useGetData } from "@/services/queryHooks/useGetData";
 import {
@@ -61,6 +61,8 @@ export function SendNotificationForm() {
   const [cityFilter, setCityFilter] = useState("");
   const [joinDate, setJoinDate] = useState<Date | null>(null);
   const [statusFilter, setStatusFilter] = useState("all");
+  const [guestFromDate, setGuestFromDate] = useState<Date | null>(null);
+  const [guestToDate, setGuestToDate] = useState<Date | null>(null);
 
   const router = useRouter();
   const { toast } = useToast();
@@ -90,6 +92,21 @@ export function SendNotificationForm() {
     recipientType === "selected_artist"
   );
 
+  const fromDate = guestFromDate ? guestFromDate : subMonths(new Date(), 1);
+  const toDate = guestToDate ? guestToDate : new Date();
+
+  const formattedFromDate = format(fromDate, "yyyy-MM-dd");
+  const formattedToDate = format(toDate, "yyyy-MM-dd");
+
+  const { data: guestUsers, isLoading } = useGetData(
+    "getAllGuestUsers",
+    `/admin/notifications/guests?fromDate=${formattedFromDate}&toDate=${formattedToDate}`,
+    recipientType === "guest_users"
+  );
+
+  const allguestUsers = guestUsers?.data;
+
+  console.log("allguestUsers", allguestUsers);
   const sendNotification = usePostData("/admin/notifications/send");
 
   const apiUsers =
@@ -330,6 +347,12 @@ export function SendNotificationForm() {
                         Selected Artists
                       </FormLabel>
                     </FormItem>
+                    <FormItem className="flex items-center space-x-3 space-y-0">
+                      <FormControl>
+                        <RadioGroupItem value="guest_users" />
+                      </FormControl>
+                      <FormLabel className="font-normal">Guest Users</FormLabel>
+                    </FormItem>
                   </RadioGroup>
                 </FormControl>
                 <FormMessage />
@@ -488,6 +511,61 @@ export function SendNotificationForm() {
                   {selectedRecipients.length !== 1 ? "s" : ""} selected
                 </div>
               )}
+            </div>
+          )}
+          {recipientType === "guest_users" && (
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6 p-6 bg-gray-50 rounded-xl shadow-sm">
+              {/* Filters */}
+              <div className="flex gap-4">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline">
+                      {guestFromDate
+                        ? format(guestFromDate, "PPP")
+                        : "Filter by From Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <Calendar
+                      mode="single"
+                      selected={guestFromDate}
+                      onSelect={setGuestFromDate}
+                    />
+                  </PopoverContent>
+                </Popover>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button variant="outline">
+                      {guestToDate
+                        ? format(guestToDate, "PPP")
+                        : "Filter by To Date"}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent>
+                    <Calendar
+                      mode="single"
+                      selected={guestToDate}
+                      onSelect={setGuestToDate}
+                    />
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              {/* Guest Users Count Card */}
+              <div className="flex flex-col items-center justify-center space-y-2 p-6 bg-white rounded-xl shadow-lg min-w-[180px]">
+                <h2 className="text-lg font-semibold text-gray-700">
+                  Guest Users
+                </h2>
+                <div className="flex items-center justify-center w-24 h-24 rounded-full bg-purple-100">
+                  <span className="text-3xl font-bold text-purple-700">
+                    {allguestUsers?.count}
+                  </span>
+                </div>
+                <p className="text-gray-500 text-sm text-center">
+                  Total number of guest users
+                </p>
+              </div>
             </div>
           )}
         </div>
