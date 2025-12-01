@@ -61,27 +61,27 @@ export function AdminList() {
     }
   }
   
-    const { mutate: inactiveAdmin, isPending: isUpdating } = usePutData(`/admin/inactivate/${makeDeactiveId}`)
+    // const { mutate: inactiveAdmin, isPending: isUpdating } = usePutData(`/admin/inactivate/${makeDeactiveId}`)
 
-    const deActivateAdmin = (id)=>{
+    // const deActivateAdmin = (id)=>{
 
-      inactiveAdmin(id, {
-      onSuccess: (response) => {
-        toast({
-          title: "Admin Deactivate successfully",
-          description: ` has been updated.`,
-        })
-        router.push(`/packages/${id}`)
-      },
-      onError: (error: any) => {
-        toast({
-          title: "Error updating package",
-          description: error?.message || "Something went wrong. Please try again.",
-          variant: "destructive",
-        })
-      },
-    })
-    }
+    //   inactiveAdmin(id, {
+    //   onSuccess: (response) => {
+    //     toast({
+    //       title: "Admin Deactivate successfully",
+    //       description: ` has been updated.`,
+    //     })
+    //     router.push(`/packages/${id}`)
+    //   },
+    //   onError: (error: any) => {
+    //     toast({
+    //       title: "Error updating package",
+    //       description: error?.message || "Something went wrong. Please try again.",
+    //       variant: "destructive",
+    //     })
+    //   },
+    // })
+    // }
   
 
   return (
@@ -128,7 +128,7 @@ export function AdminList() {
           </TableHeader>
           <TableBody>
             {filteredAdmins?.map((admin) => (
-              <TableRow key={admin.id}>
+              <TableRow key={admin._id}>
                 <TableCell>
                   <Checkbox
                     checked={selectedAdmins.includes(admin.id)}
@@ -182,7 +182,9 @@ export function AdminList() {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <UserX className="mr-2 h-4 w-4" />
-                        <span onClick={deActivateAdmin(admin?._id)}>{admin.status === "active" ? "Deactivate" : "Activate"}</span>
+                        <span 
+                        // onClick={deActivateAdmin(admin?._id)}
+                        >{admin.status === "active" ? "Deactivate" : "Activate"}</span>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
                       <DropdownMenuItem className="text-red-600">
